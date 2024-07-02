@@ -1,0 +1,12 @@
+[Unit]
+Description=Multiplex signup server
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/home/jrootham/multiplexes/request
+ExecStart=/usr/bin/java -jar signup.jar 5100
+
+[Install]
+WantedBy=multi-user.target
