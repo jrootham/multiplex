@@ -22,3 +22,14 @@ h1
 	display: inline-block;
 	vertical-align: top;
 }
+
+.row
+{
+	height: 100px;
+}
+
+.tile
+{
+	display: inline-block;
+	width: 100px;
+}

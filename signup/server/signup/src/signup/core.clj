@@ -17,6 +17,7 @@
 	(:require [signup.common :as common])
 	(:require [signup.stuff :as stuff])
 	(:require [signup.form :as form])
+	(:require [signup.location :as location])
 )
 
 (defn mail-config [from to subject body]
@@ -51,7 +52,11 @@
 	)
 )
 
-(defn respond [bedrooms-str bathrooms-str spots-str size-str]
+(defn reload [session]
+	nil
+)
+
+(defn signup [session]
 	(let
 		[
 			body [:div {:class "outer"} [:div {class "display"} "Check your email"]]
@@ -60,7 +65,7 @@
 	)
 )
 
-(defn rent-string [bedrooms-str bathrooms-str spots-str size-str]
+(defn update-data [session bedrooms-str bathrooms-str spots-str size-str]
 	(try
 		(let 
 			[
@@ -70,7 +75,10 @@
 				size (Integer/parseInt size-str)
 			]
 
-			(form/rent-string bedrooms bathrooms spots size)
+			{
+				:session (common/update-session session bedrooms bathrooms spots size)
+				:body (form/rent-string bedrooms bathrooms spots size)
+			}			
 		)
 		(catch NumberFormatException exception 
 			(let 
@@ -79,7 +87,6 @@
 						(str 
 							"An argument is not an Integer: bedrooms " bedrooms-str " ; bathrooms " ; bathrooms-str 
 							" ; spots " spots-str " ; size " size-str)
-					FOO (println message)
 				]
 				message
 			)
@@ -87,21 +94,32 @@
 	)
 )
 
-(defn location-update [x y state]
-	nil
-)
 
 (compojure/defroutes signup
-	(compojure/GET "/signup.html" [key] (form/page key))
-	(compojure/POST "/reload" [bedrooms bathrooms spots size] (respond bedrooms bathrooms spots size))
-	(compojure/POST "/signup" [bedrooms bathrooms spots size] (respond bedrooms bathrooms spots size))
-	(compojure/POST "/update" [bedrooms bathrooms spots size] (rent-string bedrooms bathrooms spots size))
-	(compojure/POST "/location-update" [x y state] (location-update x y state))
+	(compojure/GET "/signup.html" [] (form/new-page))
+	(compojure/GET "/update.html" [key] (form/page key))
+	(compojure/POST "/reload" [session] (reload session))
+	(compojure/POST "/signup" [session] (signup session))
+	(compojure/POST "/update" [session bedrooms bathrooms spots size] (update-data session bedrooms bathrooms spots size))
+	(compojure/POST "/location" [session x y] (location/update-location session x y))
 	(compojure-route/not-found (list "Page not found"))
+)
+
+(defn wrap-get-session [handler]
+	(fn [request]
+		(let 
+		[
+			params (get request :params)
+			session (get request :session)
+		]
+			(handler (assoc request :params (assoc params :session session)))
+		)
+	)
 )
 
 (defn handler []
 	(-> signup
+		(wrap-get-session)
 		(session/wrap-session)
 		(params/wrap-params)
     (resource/wrap-resource "public")

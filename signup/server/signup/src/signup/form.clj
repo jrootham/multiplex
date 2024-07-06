@@ -4,6 +4,7 @@
 	(:require [hiccup.page :as page])
 	(:require [hiccup.form :as form])
 	(:require [signup.common :as common])
+	(:require [signup.location :as location])
 )
 
 
@@ -116,38 +117,52 @@
 	]
 )
 
-(defn contents [bedrooms bathrooms spots size]
-	[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
-		[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
-		(email)
-		(pick-bedrooms bedrooms)
-		(pick-bathrooms bathrooms)
-		(pick-spots spots)
-		(pick-size size)
+(defn contents [session]
+	(let 
+		[
+			{
+				bedrooms :bedrooms
+				bathrooms :bathrooms 
+				spots :spots
+				size :size
+				locations :locations
+			} session
+		]
+		[:div
+			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
+				[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+				(email)
+				(pick-bedrooms bedrooms)
+				(pick-bathrooms bathrooms)
+				(pick-spots spots)
+				(pick-size size)
+			]
 
-		(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
-		(form/submit-button {:hx-post "/multiplex/server/signup" :hx-target "#contents"} "Submit")
+			(location/location-map session)
+			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
+			(form/submit-button {:hx-post "/multiplex/server/signup" :hx-target "#contents"} "Submit")
+		]
+	)
+)
+
+(defn body [session]
+	[:div {:id "outer"}
+		[:h1 "Multiplex Signup Sheet"] 
+		[:div {:id "contents"} (contents session)]
 	]
 )
 
-(defn body [bedrooms bathrooms spots size]
-	[:div {:id "outer"}
-		[:h1 "Multiplex Signup Sheet"] 
-		[:div {:id "contents"} (contents bedrooms bathrooms spots size)]
-	]
+(defn response [session]
+	{
+		:session session
+		:body (page/html5 head (body session))
+	}
+)
+
+(defn new-page []
+	(response (common/make-session))
 )
 
 (defn page [key]
-	(if (= key 0)
-		(page/html5 head (body common/BEDROOMS common/BATHROOMS common/SPOTS common/SIZE))
-		(let
-			[
-				bedrooms 1
-				bathrooms 1
-				spots 0 
-				size 50
-			]
-			(page/html5 head (body bedrooms bathrooms spots size))
-		)
-	)
+	nil
 )
