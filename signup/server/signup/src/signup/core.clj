@@ -4,14 +4,19 @@
 	(:require [ring.adapter.jetty :as jetty])
 	(:require [ring.util.response :as response])
 	(:require [ring.middleware.session :as session])
+	(:require [ring.middleware.resource :as resource])
+;	(:require [ring.middleware.content-type :as content-type])
+;	(:require [ring.middleware.not-modifed :as not-modifed])
 	(:require [ring.middleware.params :as params])
 	(:require [compojure.core :as compojure])
 	(:require [compojure.route :as compojure-route])
 	(:require [postal.core :as postal])
-	(:require [signup.stuff :as stuff])
 	(:require [hiccup2.core :as hiccup])
 	(:require [hiccup.page :as page])
 	(:require [ring-debug-logging.core :as debug])
+	(:require [signup.common :as common])
+	(:require [signup.stuff :as stuff])
+	(:require [signup.form :as form])
 )
 
 (defn mail-config [from to subject body]
@@ -46,18 +51,52 @@
 	)
 )
 
-(defn respond [bedrooms bathrooms lots size]
+(defn respond [bedrooms-str bathrooms-str spots-str size-str]
 	(let
 		[
-			foo (println bedrooms bathrooms lots size)
+			body [:div {:class "outer"} [:div {class "display"} "Check your email"]]
 		]
-
-		"Check your email"
+		(str (hiccup/html body))
 	)
 )
 
+(defn rent-string [bedrooms-str bathrooms-str spots-str size-str]
+	(try
+		(let 
+			[
+				bedrooms (Integer/parseInt bedrooms-str)
+				bathrooms (Integer/parseInt bathrooms-str)
+				spots (Integer/parseInt spots-str)
+				size (Integer/parseInt size-str)
+			]
+
+			(form/rent-string bedrooms bathrooms spots size)
+		)
+		(catch NumberFormatException exception 
+			(let 
+				[
+					message 
+						(str 
+							"An argument is not an Integer: bedrooms " bedrooms-str " ; bathrooms " ; bathrooms-str 
+							" ; spots " spots-str " ; size " size-str)
+					FOO (println message)
+				]
+				message
+			)
+		)
+	)
+)
+
+(defn location-update [x y state]
+	nil
+)
+
 (compojure/defroutes signup
-	(compojure/POST "/signup" [bedrooms bathrooms lots size] (respond bedrooms bathrooms lots size))
+	(compojure/GET "/signup.html" [key] (form/page key))
+	(compojure/POST "/reload" [bedrooms bathrooms spots size] (respond bedrooms bathrooms spots size))
+	(compojure/POST "/signup" [bedrooms bathrooms spots size] (respond bedrooms bathrooms spots size))
+	(compojure/POST "/update" [bedrooms bathrooms spots size] (rent-string bedrooms bathrooms spots size))
+	(compojure/POST "/location-update" [x y state] (location-update x y state))
 	(compojure-route/not-found (list "Page not found"))
 )
 
@@ -65,7 +104,8 @@
 	(-> signup
 		(session/wrap-session)
 		(params/wrap-params)
-		(debug/wrap-with-logger)
+    (resource/wrap-resource "public")
+;		(debug/wrap-with-logger)
 	)
 )
 

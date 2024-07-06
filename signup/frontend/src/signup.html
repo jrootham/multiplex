@@ -16,17 +16,18 @@
 <body>
 	<div id="outer">
 		<h1>Multiplex Signup Sheet</h1>
-		<div>
-			<div>
-				<div id="expected">Expected rent: $1,100 Expected Member Loan: $8,800</div>
-			</div>
-			<form method="post" action="/multiplex/server/signup">
+		<div id="contents">
+			<form hx-post="/multiplex/server/update" hx-trigger="change" hx-target="#costs">
+				<div id="costs">
+					Expected rent: $1,100 Expected Member Loan: $8,800S
+				</div>
+
 				include(email.html)
 				include(bedrooms.html)
 				include(bathrooms.html)
 				include(parking.html)
 				include(size.html)
-				<button>Submit</button>
+				<button hx-post="/multiplex/server/signup" hx-target="#contents">Submit</button>
 			</form>
 		</div>
 	</div>
