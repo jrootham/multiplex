@@ -11,6 +11,9 @@
 		[compojure "1.7.1"]
 		[com.draines/postal "2.0.5"]
 		[hiccup "2.0.0-RC1"]
+		[com.github.seancorfield/next.jdbc "1.3.939"]
+		[org.postgresql/postgresql "42.7.3"]
+		[crypto-random "1.2.1"]
 		[bananaoomarang/ring-debug-logging "1.1.0"]  	
   ]
   :main ^:skip-aot signup.core

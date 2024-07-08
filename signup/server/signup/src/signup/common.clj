@@ -34,12 +34,14 @@
 		:bathrooms BATHROOMS
 		:spots SPOTS
 		:size SIZE
+		:address ""
 		:locations (make-locations MAP_WIDTH MAP_HEIGHT)
 	}
 )
 
-(defn update-session [session bedrooms bathrooms spots size]
+(defn update-session [session address bedrooms bathrooms spots size]
 	(-> session
+		(assoc :address address)
 		(assoc :bedrooms bedrooms)
 		(assoc :bathrooms bathrooms)
 		(assoc :spots spots)

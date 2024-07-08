@@ -13,12 +13,19 @@
 	(:require [postal.core :as postal])
 	(:require [hiccup2.core :as hiccup])
 	(:require [hiccup.page :as page])
-	(:require [ring-debug-logging.core :as debug])
+	(:require [hiccup.element :as element])
+	(:require [hiccup.util :as util])
+	(:require [crypto.random :as random])
 	(:require [signup.common :as common])
 	(:require [signup.stuff :as stuff])
 	(:require [signup.form :as form])
 	(:require [signup.location :as location])
+	(:require [ring-debug-logging.core :as debug])
 )
+
+(def MAIL_SUBJECT "Co-op verify email")
+(def KEY_SIZE 16)
+(def VERIFY_URL "https://jrootham.ca/multiplex/server/verify.html")
 
 (defn mail-config [from to subject body]
 	{
@@ -29,26 +36,34 @@
 	}
 )
 
-(defn make-subject [index]
-	(str "Test " index)
-)
-
 (defn make-response [result]
-	(response/response (str (get result :code) " " (get result :error) " " (get result :message)))
+	"Go check your email"
 )
 
-(defn make-body [index]
-	(page/html5 (str "This is test number " index))
+(defn make-body []
+	(page/html5 
+		form/head
+		[:body 
+			[:div 
+				"Click on the link to "
+				(element/link-to (util/url VERIFY_URL {:key (random/hex KEY_SIZE)}) "verify")]
+				" your email"
+			]
+	)
 )
 
-(defn send-mail [address index]
+(defn send-mail [address]
 	(let 
 		[
 			from (:user stuff/mailer)
-			args (mail-config from address (make-subject index) (make-body index))
-			result (postal/send-message stuff/mailer args)
+			args (mail-config from address MAIL_SUBJECT (make-body))
 		]
-		(make-response result)
+		(try
+			(make-response (postal/send-message stuff/mailer args))
+			(catch Exception exception
+				(println exception)
+			)
+		)
 	)
 )
 
@@ -56,16 +71,17 @@
 	nil
 )
 
-(defn signup [session]
+(defn do-signup [session]
 	(let
 		[
-			body [:div {:class "outer"} [:div {class "display"} "Check your email"]]
+			address (get session :address)
+			body [:div {:class "outer"} [:div {class "display"} (send-mail address)]]
 		]
 		(str (hiccup/html body))
 	)
 )
 
-(defn update-data [session bedrooms-str bathrooms-str spots-str size-str]
+(defn update-data [session address bedrooms-str bathrooms-str spots-str size-str]
 	(try
 		(let 
 			[
@@ -76,7 +92,7 @@
 			]
 
 			{
-				:session (common/update-session session bedrooms bathrooms spots size)
+				:session (common/update-session session address bedrooms bathrooms spots size)
 				:body (form/rent-string bedrooms bathrooms spots size)
 			}			
 		)
@@ -94,13 +110,18 @@
 	)
 )
 
+(defn set-address [session ])
 
 (compojure/defroutes signup
 	(compojure/GET "/signup.html" [] (form/new-page))
 	(compojure/GET "/update.html" [key] (form/page key))
+	(compojure/GET "/verify.html" [key] (form/verify key))
 	(compojure/POST "/reload" [session] (reload session))
-	(compojure/POST "/signup" [session] (signup session))
-	(compojure/POST "/update" [session bedrooms bathrooms spots size] (update-data session bedrooms bathrooms spots size))
+	(compojure/POST "/signup" [session] (do-signup session))
+	(compojure/POST "/update" 
+		[session address bedrooms bathrooms spots size] 
+		(update-data session address bedrooms bathrooms spots size)
+	)
 	(compojure/POST "/location" [session x y] (location/update-location session x y))
 	(compojure-route/not-found (list "Page not found"))
 )

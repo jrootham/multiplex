@@ -9,7 +9,7 @@
 
 
 (def BEDROOM_VALUES (range 1 6))
-(def BATHROOM_VALUES (range 1 3))
+(def BATHROOM_VALUES (range 1 4))
 (def SPOT_VALUES (range 0 4))
 (def SIZE_VALUES (range 50 210 10))
 
@@ -74,11 +74,8 @@
 	)
 )
 
-(defn email []
-	[:div
-		[:label {:for "email"} "Enter your email:"]
-		[:input {:type "email" :id "email" :size "30"}]
-	]
+(defn email [address]
+	[:div (form/email-field "address" address)]
 )
 
 (defn pick-bedrooms [bedrooms]
@@ -121,6 +118,7 @@
 	(let 
 		[
 			{
+				address :address
 				bedrooms :bedrooms
 				bathrooms :bathrooms 
 				spots :spots
@@ -131,14 +129,14 @@
 		[:div
 			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
 				[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
-				(email)
+				(email address)
 				(pick-bedrooms bedrooms)
 				(pick-bathrooms bathrooms)
 				(pick-spots spots)
 				(pick-size size)
 			]
 
-			(location/location-map session)
+			(location/location-map session location/tile)
 			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
 			(form/submit-button {:hx-post "/multiplex/server/signup" :hx-target "#contents"} "Submit")
 		]
@@ -152,17 +150,29 @@
 	]
 )
 
-(defn response [session]
-	{
-		:session session
-		:body (page/html5 head (body session))
-	}
-)
-
 (defn new-page []
-	(response (common/make-session))
+	(let [session (common/make-session)]
+		{
+			:session session
+			:body (page/html5 head (body session))
+		}
+	)
 )
 
 (defn page [key]
-	nil
+	(let [session (common/make-session)]
+		{
+			:session session
+			:body (page/html5 head (body session))
+		}
+	)
+)
+
+(defn verify [key]
+	(let [session (common/make-session)]
+		{
+			:session session
+			:body (page/html5 head [:body [:div "we made it"]])
+		}
+	)
 )

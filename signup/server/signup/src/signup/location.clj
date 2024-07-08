@@ -3,11 +3,16 @@
 	(:require [hiccup2.core :as hiccup])
 	(:require [hiccup.page :as page])
 	(:require [hiccup.form :as form])
+	(:require [hiccup.element :as element])
 	(:require [signup.common :as common])
 )
 
 (defn get-value [session x y]
 	(get-in session [:locations x y])
+)
+
+(defn file-name [x y value]
+	(str "tiles/" x "_" y "_" value ".png")
 )
 
 (defn tile [session x y]
@@ -24,7 +29,7 @@
 			[:input 
 				{
 					:type "image" 
-					:src (str "tiles/" x y value ".png") 
+					:src (file-name x y value) 
 				}
 			] 
 			(form/hidden-field "x" x)
@@ -33,7 +38,11 @@
 	)
 )
 
-(defn location-map [session]
+(defn display-tile [session x y]
+	(element/image x y (get-value session x y))
+)
+
+(defn location-map [session tile-fn]
 	(let 
 		[
 			outer-fn 
@@ -42,7 +51,7 @@
 						[
 							inner-fn 
 								(fn [x] 
-									(tile session x y)
+									(tile-fn session x y)
 								)
 						]
 						[:div {:class "row"} (map inner-fn (range 0 common/MAP_WIDTH))]
