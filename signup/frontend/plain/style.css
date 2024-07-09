@@ -54,3 +54,21 @@ h1
 {
 	width: 50px;
 }
+
+.docdiv
+{
+	width: 1000px;
+}
+
+.doctext
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.legendbox
+{
+	display: grid;
+	grid-template-columns: 4fr 1fr;
+}
+

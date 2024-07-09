@@ -115,6 +115,37 @@
 	]
 )
 
+(defn location-docs []
+	[:div {:class "docdiv"}
+		[:div {:class "doctext"}
+			(str
+				"The map below is for you to indicate your preferences about where you want to live in the city. "
+				"The city is divided into a 10x8 grid of tiles. "
+				"The background of each tile is coloured according to how much you indicated "
+				"that you want to live there."
+			)
+		]
+		[:div {:class "legendbox"}
+			[:div {:class "legend"} "0: I don't want to live there "]
+			[:div {:class "sample"}]
+			[:div {:class "legend"} "1: I would prefer not to live there "] 
+			[:div {:class "sample"}]
+			[:div {:class "legend"} "2: I would be fine with living there "] 
+			[:div {:class "sample"}]
+			[:div {:class "legend"} "3: I really want to live there "]
+			[:div {:class "sample"}]
+		]
+
+		[:div {:class "doctext"}
+			(str
+				"Each tile starts at level 0. "
+				"Clicking on a tile adds one to the level, unless it is at level 3, in which case it goes back to level 0."
+			)
+		]
+	]
+
+)
+
 (defn form-contents [session]
 	(let 
 		[
@@ -137,6 +168,7 @@
 				(pick-size size)
 			]
 
+			(location-docs)
 			(location/location-map session location/tile)
 
 ;			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
