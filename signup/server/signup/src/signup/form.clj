@@ -75,7 +75,8 @@
 )
 
 (defn email [address]
-	[:div (form/email-field "address" address)]
+;	[:div (form/email-field {:required "true"} "address" address)]
+	[:div "<input type=\"email\" id=\"email\" size=\"30\" required />"]
 )
 
 (defn pick-bedrooms [bedrooms]
@@ -114,7 +115,7 @@
 	]
 )
 
-(defn contents [session]
+(defn form-contents [session]
 	(let 
 		[
 			{
@@ -137,13 +138,42 @@
 			]
 
 			(location/location-map session location/tile)
-			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
+
+;			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
 			(form/submit-button {:hx-post "/multiplex/server/signup" :hx-target "#contents"} "Submit")
+
 		]
 	)
 )
 
-(defn body [session]
+(defn display-contents [session]
+	(let 
+		[
+			{
+				address :address
+				bedrooms :bedrooms
+				bathrooms :bathrooms 
+				spots :spots
+				size :size
+				locations :locations
+			} session
+		]
+		[:div
+				[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+				[:div address]
+				[:div 
+					(format 
+						"Bedrooms %d bathrooms %d parking spots %d size %d sq m (%,d sq ft)"
+						bedrooms bathrooms spots size (* 10 size)
+					)
+				]
+				[:div (location/location-map session location/display-tile)]
+		]
+	)
+)
+
+
+(defn body [session contents]
 	[:div {:id "outer"}
 		[:h1 "Multiplex Signup Sheet"] 
 		[:div {:id "contents"} (contents session)]
@@ -154,7 +184,7 @@
 	(let [session (common/make-session)]
 		{
 			:session session
-			:body (page/html5 head (body session))
+			:body (page/html5 head (body session form-contents))
 		}
 	)
 )
@@ -163,7 +193,7 @@
 	(let [session (common/make-session)]
 		{
 			:session session
-			:body (page/html5 head (body session))
+			:body (page/html5 head (body session form-contents))
 		}
 	)
 )
@@ -172,7 +202,7 @@
 	(let [session (common/make-session)]
 		{
 			:session session
-			:body (page/html5 head [:body [:div "we made it"]])
+			:body (page/html5 head (body session display-contents))
 		}
 	)
 )

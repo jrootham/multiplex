@@ -25,11 +25,32 @@ h1
 
 .row
 {
-	height: 100px;
+	height: 50px;
+}
+
+.mode1 input
+{
+    opacity: .85
+}
+
+.mode2 input
+{
+    opacity: .7
+}
+
+.mode3 input
+{
+    opacity: .55
 }
 
 .tile
 {
+    background-color: green;
 	display: inline-block;
-	width: 100px;
+	width: 50px;
+}
+
+.tile_image
+{
+	width: 50px;
 }

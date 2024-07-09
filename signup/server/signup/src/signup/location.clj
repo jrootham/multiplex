@@ -7,29 +7,27 @@
 	(:require [signup.common :as common])
 )
 
-(defn get-value [session x y]
-	(get-in session [:locations x y])
-)
-
-(defn file-name [x y value]
-	(str "tiles/" x "_" y "_" value ".png")
+(defn file-name [x y]
+	(str "tiles/map_" y "_" x ".png")
 )
 
 (defn tile [session x y]
 	(let 
 		[
-			value (get-value session x y)
+			value (common/get-state session x y)
 		]
 		[:form 
 			{
-				:class "tile"
+				:class (str "tile" " " "mode" value)
 				:hx-post "/multiplex/server/location"
 				:hx-target "this"
+				:hx-swap :outerHTML
 			} 
 			[:input 
 				{
+					:class "tile_image"
 					:type "image" 
-					:src (file-name x y value) 
+					:src (file-name x y) 
 				}
 			] 
 			(form/hidden-field "x" x)
@@ -39,7 +37,12 @@
 )
 
 (defn display-tile [session x y]
-	(element/image x y (get-value session x y))
+	(let 
+		[
+			value (common/get-state session x y)
+		]
+		(element/image {:class (str "tile_image" " " "mode" value)} (file-name x y))
+	)
 )
 
 (defn location-map [session tile-fn]
@@ -67,8 +70,8 @@
 		[
 			x (Integer/parseInt x-str)
 			y (Integer/parseInt y-str)
-			state (get-value session x y)
-			new-session (assoc-in session [:locations x y] (mod (+ state 1) common/MAP_HEIGHT))
+			state (common/get-state session x y)
+			new-session (common/set-state session x y (mod (+ state 1) common/MAP_DEPTH))
 		]
 		{
 			:session new-session

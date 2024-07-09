@@ -11,9 +11,9 @@
 
 ; Map values
 
-(def MAP_WIDTH 2)
-(def MAP_HEIGHT 2)
-(def MAP_DEPTH 2)
+(def MAP_WIDTH 20)
+(def MAP_HEIGHT 8)
+(def MAP_DEPTH 4)
 
 ; cost values
 
@@ -25,7 +25,15 @@
 (def LOAN-MONTHS 8)
 
 (defn make-locations [width height]
-	(vec (repeat height (vec (repeat width 0))))
+	(vec (repeat width (vec (repeat height 0))))
+)
+
+(defn get-state [session x y]
+	(get-in session [:locations x y])
+)
+
+(defn set-state [session x y state]
+	(assoc-in session [:locations x y] state)
 )
 
 (defn make-session []

@@ -110,8 +110,6 @@
 	)
 )
 
-(defn set-address [session ])
-
 (compojure/defroutes signup
 	(compojure/GET "/signup.html" [] (form/new-page))
 	(compojure/GET "/update.html" [key] (form/page key))
