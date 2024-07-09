@@ -17,11 +17,11 @@
 
 ; cost values
 
-(def BEDROOM-COST (* 1000 0.003) )
-(def BATHROOM-COST (* 10000 0.003)) 
-(def SIZE-COST (* 1000 0.003)) 
+(def BEDROOM-COST 300)
+(def BATHROOM-COST 500) 
+(def SIZE-COST 8) 
 (def SPOT-COST 300) 
-(def KITCHEN-COST (* 10000 0.003))
+(def KITCHEN-COST 1000)
 (def LOAN-MONTHS 8)
 
 (defn make-locations [width height]
@@ -47,9 +47,8 @@
 	}
 )
 
-(defn update-session [session address bedrooms bathrooms spots size]
+(defn update-session [session bedrooms bathrooms spots size]
 	(-> session
-		(assoc :address address)
 		(assoc :bedrooms bedrooms)
 		(assoc :bathrooms bathrooms)
 		(assoc :spots spots)

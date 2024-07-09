@@ -18,14 +18,14 @@
 		]
 		[:form 
 			{
-				:class (str "tile" " " "mode" value)
+				:class "tile"
 				:hx-post "/multiplex/server/location"
 				:hx-target "this"
 				:hx-swap :outerHTML
 			} 
 			[:input 
 				{
-					:class "tile_image"
+					:class (str "tile_image" " " "mode" value)
 					:type "image" 
 					:src (file-name x y) 
 				}

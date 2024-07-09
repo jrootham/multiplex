@@ -127,13 +127,17 @@
 		]
 		[:div {:class "legendbox"}
 			[:div {:class "legend"} "0: I don't want to live there "]
-			[:div {:class "sample"}]
+			[:div {:class "outersample"} [:div {:class "sample"}]]
+			[:div {:class "buffer"}]
 			[:div {:class "legend"} "1: I would prefer not to live there "] 
-			[:div {:class "sample"}]
+			[:div {:class "outersample"} [:div {:class "sample mode1"}]]
+			[:div {:class "buffer"}]
 			[:div {:class "legend"} "2: I would be fine with living there "] 
-			[:div {:class "sample"}]
+			[:div {:class "outersample"} [:div {:class "sample mode2"}]]
+			[:div {:class "buffer"}]
 			[:div {:class "legend"} "3: I really want to live there "]
-			[:div {:class "sample"}]
+			[:div {:class "outersample"} [:div {:class "sample mode3"}]]
+			[:div {:class "buffer"}]
 		]
 
 		[:div {:class "doctext"}
@@ -159,9 +163,14 @@
 			} session
 		]
 		[:div
-			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
-				[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+			[:div {:id "message"} ""]
+			[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+
+			[:form {:hx-post "/multiplex/server/address" :hx-trigger "change" :hx-target "#message"}
 				(email address)
+			]
+
+			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
 				(pick-bedrooms bedrooms)
 				(pick-bathrooms bathrooms)
 				(pick-spots spots)

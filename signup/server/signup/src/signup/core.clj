@@ -82,7 +82,14 @@
 	)
 )
 
-(defn update-data [session address bedrooms-str bathrooms-str spots-str size-str]
+(defn set-address [session address]
+	{
+		:session (assoc session :address address)
+		:body ""	
+	}
+)
+
+(defn update-data [session bedrooms-str bathrooms-str spots-str size-str]
 	(try
 		(let 
 			[
@@ -93,7 +100,7 @@
 			]
 
 			{
-				:session (common/update-session session address bedrooms bathrooms spots size)
+				:session (common/update-session session bedrooms bathrooms spots size)
 				:body (form/rent-string bedrooms bathrooms spots size)
 			}			
 		)
@@ -117,9 +124,10 @@
 	(compojure/GET "/verify.html" [key] (form/verify key))
 	(compojure/POST "/reload" [session] (reload session))
 	(compojure/POST "/signup" [session] (do-signup session))
+	(compojure/POST "/address" [session address] (set-address session address))
 	(compojure/POST "/update" 
-		[session address bedrooms bathrooms spots size] 
-		(update-data session address bedrooms bathrooms spots size)
+		[session bedrooms bathrooms spots size] 
+		(update-data session bedrooms bathrooms spots size)
 	)
 	(compojure/POST "/location" [session x y] (location/update-location session x y))
 	(compojure-route/not-found (list "Page not found"))

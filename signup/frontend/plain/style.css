@@ -28,17 +28,17 @@ h1
 	height: 50px;
 }
 
-.mode1 input
+.mode1 
 {
     opacity: .85
 }
 
-.mode2 input
+.mode2 
 {
     opacity: .7
 }
 
-.mode3 input
+.mode3 
 {
     opacity: .55
 }
@@ -69,6 +69,20 @@ h1
 .legendbox
 {
 	display: grid;
-	grid-template-columns: 4fr 1fr;
+	grid-template-columns: 20em 29px auto;
+}
+
+.outersample
+{
+	width: 25px;
+    background-color: green;
+}
+
+.sample
+{
+	width: 25px;
+	height: 25px;
+	border: solid black 1px; 
+	background-color: white;
 }
 
