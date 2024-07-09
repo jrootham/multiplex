@@ -75,8 +75,8 @@
 )
 
 (defn email [address]
-;	[:div (form/email-field {:required "true"} "address" address)]
-	[:div "<input type=\"email\" id=\"email\" size=\"30\" required />"]
+	[:div (form/email-field {:required "true"} "address" address)]
+;	[:div "<input type=\"email\" id=\"email\" size=\"30\" required />"]
 )
 
 (defn pick-bedrooms [bedrooms]

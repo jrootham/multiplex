@@ -40,7 +40,7 @@
 	"Go check your email"
 )
 
-(defn make-body []
+(defn make-email-body []
 	(page/html5 
 		form/head
 		[:body 
@@ -55,8 +55,9 @@
 (defn send-mail [address]
 	(let 
 		[
+			foo (println address)
 			from (:user stuff/mailer)
-			args (mail-config from address MAIL_SUBJECT (make-body))
+			args (mail-config from address MAIL_SUBJECT (make-email-body))
 		]
 		(try
 			(make-response (postal/send-message stuff/mailer args))
