@@ -6,7 +6,7 @@ Type=simple
 Restart=always
 RestartSec=10
 WorkingDirectory=/home/jrootham/multiplexes/request
-ExecStart=/usr/bin/java -jar signup.jar 5100
+ExecStart=/usr/bin/java -jar signup.jar 5100 multiplex_dev
 
 [Install]
 WantedBy=multi-user.target

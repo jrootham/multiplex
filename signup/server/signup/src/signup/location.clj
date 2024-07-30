@@ -38,9 +38,7 @@
 
 (defn display-tile [session x y]
 	(let 
-		[
-			value (common/get-state session x y)
-		]
+		[value (common/get-state session x y)]
 		(element/image {:class (str "tile_image" " " "mode" value)} (file-name x y))
 	)
 )

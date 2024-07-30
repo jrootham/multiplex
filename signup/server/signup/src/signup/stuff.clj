@@ -9,3 +9,11 @@
 		:pass "qTu07c!17"
 	} 
 )
+
+(def db
+	{
+		:dbtype "postgresql"
+		:user "multiplex"
+		:password "refer gravity thread respect"
+	}
+)

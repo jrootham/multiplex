@@ -10,7 +10,7 @@
 
 (def BEDROOM_VALUES (range 1 6))
 (def BATHROOM_VALUES (range 1 4))
-(def SPOT_VALUES (range 0 4))
+(def PARKING_VALUES (range 0 4))
 (def SIZE_VALUES (range 50 210 10))
 
 (def SIMPLE_LABELS (vector "No " "One " "Two " "Three " "Four " "Five " "Six " "Seven " "Eight " "Nine " "Ten "))
@@ -43,7 +43,7 @@
 	]
 )
 
-(defn rent-string [bedrooms bathrooms spots size]
+(defn rent-string [bedrooms bathrooms parking size]
 	(let
 		[
 			rent
@@ -51,7 +51,7 @@
 					(* common/BEDROOM-COST bedrooms) 
 					(* common/BATHROOM-COST bathrooms) 
 					(* common/SIZE-COST size) 
-					(* common/SPOT-COST spots) 
+					(* common/PARKING-COST parking) 
 					(* common/KITCHEN-COST 1)
 				)
 			loan (* common/LOAN-MONTHS rent)
@@ -97,11 +97,11 @@
 	]
 )
 
-(defn pick-spots [spots]
+(defn pick-parking [parking]
 	[:div {:class "choose"}
 		[:fieldset 
-			[:legend "Select number of parking spots"]
-			(map (make-radio-map "spots" simple-label spots) SPOT_VALUES)
+			[:legend "Select number of parking parking"]
+			(map (make-radio-map "parking" simple-label parking) PARKING_VALUES)
 		]
 	]
 )
@@ -157,14 +157,14 @@
 				address :address
 				bedrooms :bedrooms
 				bathrooms :bathrooms 
-				spots :spots
+				parking :parking
 				size :size
 				locations :locations
 			} session
 		]
 		[:div
 			[:div {:id "message"} ""]
-			[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
 
 			[:form {:hx-post "/multiplex/server/address" :hx-trigger "change" :hx-target "#message"}
 				(email address)
@@ -173,7 +173,7 @@
 			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
 				(pick-bedrooms bedrooms)
 				(pick-bathrooms bathrooms)
-				(pick-spots spots)
+				(pick-parking parking)
 				(pick-size size)
 			]
 
@@ -194,18 +194,18 @@
 				address :address
 				bedrooms :bedrooms
 				bathrooms :bathrooms 
-				spots :spots
+				parking :parking
 				size :size
 				locations :locations
 			} session
 		]
 		[:div
-				[:div {:id "costs"} (rent-string bedrooms bathrooms spots size)]
+				[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
 				[:div address]
 				[:div 
 					(format 
-						"Bedrooms %d bathrooms %d parking spots %d size %d sq m (%,d sq ft)"
-						bedrooms bathrooms spots size (* 10 size)
+						"Bedrooms %d bathrooms %d parking parking %d size %d sq m (%,d sq ft)"
+						bedrooms bathrooms parking size (* 10 size)
 					)
 				]
 				[:div (location/location-map session location/display-tile)]
@@ -221,6 +221,13 @@
 	]
 )
 
+(defn error-body [message]
+	[:div {:id "outer"}
+		[:h1 "Multiplex Signup Sheet"] 
+		[:div {:id "contents"} message ]
+	]
+)
+
 (defn new-page []
 	(let [session (common/make-session)]
 		{
@@ -230,8 +237,8 @@
 	)
 )
 
-(defn page [key]
-	(let [session (common/make-session)]
+(defn page [db-name key]
+	(let [session (common/load-session db-name key)]
 		{
 			:session session
 			:body (page/html5 head (body session form-contents))
@@ -239,11 +246,31 @@
 	)
 )
 
-(defn verify [key]
-	(let [session (common/make-session)]
-		{
-			:session session
-			:body (page/html5 head (body session display-contents))
-		}
-	)
+(defn verify [db-name key]
+	(try
+		(with-open [connection (common/make-connection db-name)]
+			(let [result (common/load-session connection key)]
+				(if (get result :success)
+					(let 
+						[
+							verified (common/mark-verified connection (get result :id))
+							session (get result :session)
+						]
+						(if verified
+							{
+								:session session
+								:body (page/html5 head (body session display-contents))
+							}
+							(page/html5 head (error-body "Database update error"))
+						)
+					)
+					(page/html5 head (error-body (get result :message)))
+				)
+			)
+		)
+		(catch Exception exception
+			(println exception)
+			(page/html5 head (error-body (get (Throwable->map exception) :cause)))
+		)
+	)	
 )

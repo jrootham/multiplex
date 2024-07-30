@@ -13,6 +13,7 @@
 		[hiccup "2.0.0-RC1"]
 		[com.github.seancorfield/next.jdbc "1.3.939"]
 		[org.postgresql/postgresql "42.7.3"]
+		[cheshire "5.13.0"]
 		[crypto-random "1.2.1"]
 		[bananaoomarang/ring-debug-logging "1.1.0"]  	
   ]
