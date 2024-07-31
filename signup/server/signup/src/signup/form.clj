@@ -75,8 +75,17 @@
 )
 
 (defn email [address]
-	[:div (form/email-field {:required "true"} "address" address)]
-;	[:div "<input type=\"email\" id=\"email\" size=\"30\" required />"]
+	[:form 
+		{
+			:hx-post "/multiplex/server/address" 
+			:hx-trigger "change" 
+			:hx-target "#message"
+			:hx-select "#message"
+			:hx-swap "outerHTML"
+			:hx-select-oob "#submit"
+		}
+		[:div (form/email-field {:required "true"} "address" address)]
+	]
 )
 
 (defn pick-bedrooms [bedrooms]
@@ -115,6 +124,14 @@
 	]
 )
 
+(defn legend [text class]
+	[:div {:class "legendbox"}
+		[:div {:class "legend"} text]
+		[:div {:class "outersample"} [:div {:class class}]]
+		[:div {:class "buffer"}]
+	]
+)
+
 (defn location-docs []
 	[:div {:class "docdiv"}
 		[:div {:class "doctext"}
@@ -125,19 +142,11 @@
 				"that you want to live there."
 			)
 		]
-		[:div {:class "legendbox"}
-			[:div {:class "legend"} "0: I don't want to live there "]
-			[:div {:class "outersample"} [:div {:class "sample"}]]
-			[:div {:class "buffer"}]
-			[:div {:class "legend"} "1: I would prefer not to live there "] 
-			[:div {:class "outersample"} [:div {:class "sample mode1"}]]
-			[:div {:class "buffer"}]
-			[:div {:class "legend"} "2: I would be fine with living there "] 
-			[:div {:class "outersample"} [:div {:class "sample mode2"}]]
-			[:div {:class "buffer"}]
-			[:div {:class "legend"} "3: I really want to live there "]
-			[:div {:class "outersample"} [:div {:class "sample mode3"}]]
-			[:div {:class "buffer"}]
+		[:div 
+			(legend "0: I don't want to live there " "sample")
+			(legend "1: I would prefer not to live there  " "sample mode1")
+			(legend "2: I would be fine with living there " "sample mode2")
+			(legend "3: I really want to live there " "sample mode3")
 		]
 
 		[:div {:class "doctext"}
@@ -148,6 +157,25 @@
 		]
 	]
 
+)
+
+(defn submit [disabled]
+	(form/submit-button 
+		{
+			:id "submit"
+			:hx-post "/multiplex/server/signup" 
+			:hx-target "#contents"
+			:disabled disabled
+		} 
+		"Submit"
+	)
+)
+
+(defn message [disabled]
+	(if disabled
+		"Email address is invalid"
+ 		""
+	)
 )
 
 (defn form-contents [session]
@@ -162,28 +190,26 @@
 				locations :locations
 			} session
 		]
-		[:div
-			[:div {:id "message"} ""]
-			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
+		(let [invalid-address (= "" (get session :address))]
+			[:div
+				[:div {:id "message"} (message invalid-address)]
+				[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
 
-			[:form {:hx-post "/multiplex/server/address" :hx-trigger "change" :hx-target "#message"}
 				(email address)
+
+				[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
+					(pick-bedrooms bedrooms)
+					(pick-bathrooms bathrooms)
+					(pick-parking parking)
+					(pick-size size)
+				]
+
+				(location-docs)
+				(location/location-map session location/tile)
+
+				(submit invalid-address)
 			]
-
-			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
-				(pick-bedrooms bedrooms)
-				(pick-bathrooms bathrooms)
-				(pick-parking parking)
-				(pick-size size)
-			]
-
-			(location-docs)
-			(location/location-map session location/tile)
-
-;			(form/submit-button {:hx-post "/multiplex/server/reload" :hx-target "#contents"} "Reload")
-			(form/submit-button {:hx-post "/multiplex/server/signup" :hx-target "#contents"} "Submit")
-
-		]
+		)
 	)
 )
 

@@ -127,7 +127,7 @@
 (defn set-address [session address]
 	{
 		:session (assoc session :address address)
-		:body ""	
+		:body (str (hiccup/html [:div (form/message false) (form/submit false)]))
 	}
 )
 
