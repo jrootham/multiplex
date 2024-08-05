@@ -96,7 +96,7 @@
 	[:div {:class "choose"}
 		[:fieldset 
 			[:legend "Select parking spaces"]
-			(map (make-radio-map "parking spaces" simple-label parking) PARKING_VALUES)
+			(map (make-radio-map "parking" simple-label parking) PARKING_VALUES)
 		]
 	]
 )
@@ -123,7 +123,7 @@
 		[:div {:class "doctext"}
 			(str
 				"The map below is for you to indicate your preferences about where you want to live in the city. "
-				"The city is divided into a 10x8 grid of tiles. "
+				"The city is divided into a 20x8 grid of tiles. "
 				"The background of each tile is coloured according to how much you indicated "
 				"that you want to live there."
 			)
@@ -167,7 +167,7 @@
 		[:div
 			[:form 
 				{
-					:hx-post "/multiplex/server/address"
+					:hx-post "/multiplex/server/identity"
 					:hx-target "#contents"
 				}
 				[:div {:class "identity-layout"}
@@ -218,6 +218,7 @@
 	(let 
 		[
 			{
+				name :name
 				address :address
 				bedrooms :bedrooms
 				bathrooms :bathrooms 
@@ -227,8 +228,8 @@
 			} session
 		]
 		[:div
+				[:div "For " name " at " address]
 				[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
-				[:div address]
 				[:div 
 					(format 
 						"Bedrooms %d bathrooms %d parking parking %d size %d sq m (%,d sq ft)"

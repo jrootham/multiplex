@@ -65,15 +65,16 @@
 	)
 )
 
-(defn create-applicant [db-name session new-key]
+(defn new-applicant [connection session new-key]
 	(let
 		[
-			columns "(magic_key,address,bedrooms,bathrooms,parking,size,locations)"
-			places "(?,?,?,?,?,?,CAST(? AS JSON))"
+			columns "(magic_key,name,address,bedrooms,bathrooms,parking,size,locations)"
+			places "(?,?,?,?,?,?,?,CAST(? AS JSON))"
 			sql (str "INSERT INTO applicant " columns " VALUES " places ";")
 			statement [
 									sql
 									new-key
+									(get session :name)
 									(get session :address)
 									(get session :bedrooms)
 									(get session :bathrooms)
@@ -82,9 +83,38 @@
 									(json/generate-string (get session :locations))
 								]
 		]
+		(let [result (jdbc/execute-one! connection statement)]
+			(= 1 (get result :next.jdbc/update-count)) 
+		)
+	)
+)
+
+(defn delete-applicant [connection id]
+	(let
+		[
+			sql "DELETE FROM applicant WHERE id=?;"
+			statement [sql id]
+		]
+		(jdbc/execute-one! connection statement)
+	)
+)
+
+(defn create-applicant [db-name session new-key]
+	(let 
+		[
+			address (get session :address)
+			sql "SELECT id FROM applicant WHERE address=?;" 
+			statement [sql address]
+		]
 		(with-open [connection (common/make-connection db-name)]
-			(let [result (jdbc/execute-one! connection statement)]
-				(= 1 (get result :next.jdbc/update-count)) 
+			(let 
+				[
+					result (jdbc/execute-one! connection statement)
+				]
+				(if (seq result)
+					(delete-applicant connection (get result :applicant/id))
+				)
+				(new-applicant connection session new-key)
 			)
 		)
 	)
@@ -129,12 +159,52 @@
 	)
 )
 
-(defn set-identity [session name address]
+(defn identity-result [session]
+	{
+		:session session
+		:body (str (hiccup/html (form/prompt-contents session)))
+	}
+)
+
+(defn no-applicant [db-name address]
+	(let
+		[
+			sql (str "SELECT COUNT(*) FROM applicant WHERE address=? AND verified;")
+			statement [sql address]
+		]
+		(with-open [connection (common/make-connection db-name)]
+			(let [result (jdbc/execute-one! connection statement)]
+				(= 0 (get result :count)) 
+			)
+		)
+	)
+)
+
+(defn existing-applicant [db-name address session]
+	(let
+		[
+			sql (str "SELECT active FROM applicant WHERE address=? AND verified;")
+			statement [sql address]
+		]
+		(with-open [connection (common/make-connection db-name)]
+			(let [result (jdbc/execute-one! connection statement)]
+				(let [active (get result :applicant/active)]
+					(if active
+						(identity-result session)
+						(identity-result session)
+					)
+				)
+			)
+		)
+	)
+)
+
+(defn set-identity [db-name session name address]
 	(let [new-session (identity-session session name address)]
-		{
-			:session new-session
-			:body (str (hiccup/html (form/prompt-contents new-session)))
-		}
+		(if (no-applicant db-name address)
+			(identity-result new-session)
+			(existing-applicant db-name address new-session)
+		)
 	)
 )
 
@@ -159,7 +229,8 @@
 					message 
 						(str 
 							"An argument is not an Integer: bedrooms " bedrooms-str " ; bathrooms " ; bathrooms-str 
-							" ; parking " parking-str " ; size " size-str)
+							" ; parking " parking-str " ; size " size-str
+						)
 				]
 				message
 			)
@@ -173,7 +244,9 @@
 	(compojure/GET "/verify.html" [db-name key] (form/verify db-name key))
 	(compojure/POST "/reload" [db-name session] (reload db-name session))
 	(compojure/POST "/signup" [db-name session] (do-signup db-name session))
-	(compojure/POST "/address" [session name address] (set-identity session name address))
+	(compojure/POST "/identity" 
+		[db-name session name address] 
+		(set-identity db-name session name address))
 	(compojure/POST "/update" 
 		[session bedrooms bathrooms parking size] 
 		(update-data session bedrooms bathrooms parking size)
