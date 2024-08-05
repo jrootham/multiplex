@@ -5,8 +5,6 @@
 	(:require [ring.util.response :as response])
 	(:require [ring.middleware.session :as session])
 	(:require [ring.middleware.resource :as resource])
-;	(:require [ring.middleware.content-type :as content-type])
-;	(:require [ring.middleware.not-modifed :as not-modifed])
 	(:require [ring.middleware.params :as params])
 	(:require [compojure.core :as compojure])
 	(:require [compojure.route :as compojure-route])
@@ -124,11 +122,20 @@
 	)
 )
 
-(defn set-address [session address]
-	{
-		:session (assoc session :address address)
-		:body (str (hiccup/html [:div (form/message false) (form/submit false)]))
-	}
+(defn identity-session [session name address]
+	(-> session
+		(assoc :address address)
+		(assoc :name name)
+	)
+)
+
+(defn set-identity [session name address]
+	(let [new-session (identity-session session name address)]
+		{
+			:session new-session
+			:body (str (hiccup/html (form/prompt-contents new-session)))
+		}
+	)
 )
 
 (defn update-data [session bedrooms-str bathrooms-str parking-str size-str]
@@ -139,7 +146,7 @@
 				bathrooms (Integer/parseInt bathrooms-str)
 				parking (Integer/parseInt parking-str)
 				size (Integer/parseInt size-str)
-			]
+			]=
 
 			{
 				:session (common/update-session session bedrooms bathrooms parking size)
@@ -166,7 +173,7 @@
 	(compojure/GET "/verify.html" [db-name key] (form/verify db-name key))
 	(compojure/POST "/reload" [db-name session] (reload db-name session))
 	(compojure/POST "/signup" [db-name session] (do-signup db-name session))
-	(compojure/POST "/address" [session address] (set-address session address))
+	(compojure/POST "/address" [session name address] (set-identity session name address))
 	(compojure/POST "/update" 
 		[session bedrooms bathrooms parking size] 
 		(update-data session bedrooms bathrooms parking size)

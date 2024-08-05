@@ -74,20 +74,6 @@
 	)
 )
 
-(defn email [address]
-	[:form 
-		{
-			:hx-post "/multiplex/server/address" 
-			:hx-trigger "change" 
-			:hx-target "#message"
-			:hx-select "#message"
-			:hx-swap "outerHTML"
-			:hx-select-oob "#submit"
-		}
-		[:div (form/email-field {:required "true"} "address" address)]
-	]
-)
-
 (defn pick-bedrooms [bedrooms]
 	[:div {:class "choose"}
 		[:fieldset 
@@ -109,8 +95,8 @@
 (defn pick-parking [parking]
 	[:div {:class "choose"}
 		[:fieldset 
-			[:legend "Select number of parking parking"]
-			(map (make-radio-map "parking" simple-label parking) PARKING_VALUES)
+			[:legend "Select parking spaces"]
+			(map (make-radio-map "parking spaces" simple-label parking) PARKING_VALUES)
 		]
 	]
 )
@@ -159,29 +145,48 @@
 
 )
 
-(defn submit [disabled]
+(defn submit []
 	(form/submit-button 
 		{
 			:id "submit"
 			:hx-post "/multiplex/server/signup" 
 			:hx-target "#contents"
-			:disabled disabled
 		} 
 		"Submit"
 	)
 )
 
-(defn message [disabled]
-	(if disabled
-		"Email address is invalid"
- 		""
-	)
-)
-
-(defn form-contents [session]
+(defn identity-form [session]
 	(let 
 		[
 			{
+				name :name
+				address :address
+			} session
+		]
+		[:div
+			[:form 
+				{
+					:hx-post "/multiplex/server/address"
+					:hx-target "#contents"
+				}
+				[:div {:class "identity-layout"}
+					[:div "Name"]
+					[:div (form/text-field "name") name]
+					[:div "Email address"]
+					[:div (form/email-field {:required "true"} "address" address)]
+				]
+				[:button "Set Identity"]
+			]
+		]
+	)
+)
+
+(defn prompt-contents [session]
+	(let 
+		[
+			{
+				name :name
 				address :address
 				bedrooms :bedrooms
 				bathrooms :bathrooms 
@@ -190,26 +195,22 @@
 				locations :locations
 			} session
 		]
-		(let [invalid-address (= "" (get session :address))]
-			[:div
-				[:div {:id "message"} (message invalid-address)]
-				[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
+		[:div
+			[:div "For " name " from " address]
+			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
 
-				(email address)
-
-				[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
-					(pick-bedrooms bedrooms)
-					(pick-bathrooms bathrooms)
-					(pick-parking parking)
-					(pick-size size)
-				]
-
-				(location-docs)
-				(location/location-map session location/tile)
-
-				(submit invalid-address)
+			[:form {:hx-post "/multiplex/server/update" :hx-trigger "change" :hx-target "#costs"}
+				(pick-bedrooms bedrooms)
+				(pick-bathrooms bathrooms)
+				(pick-parking parking)
+				(pick-size size)
 			]
-		)
+
+			(location-docs)
+			(location/location-map session location/tile)
+
+			(submit)
+		]
 	)
 )
 
@@ -235,6 +236,10 @@
 					)
 				]
 				[:div (location/location-map session location/display-tile)]
+				[:div 
+					[:button "Edit"]
+					[:button "Delete"]
+				]
 		]
 	)
 )
@@ -258,7 +263,7 @@
 	(let [session (common/make-session)]
 		{
 			:session session
-			:body (page/html5 head (body session form-contents))
+			:body (page/html5 head (body session identity-form))
 		}
 	)
 )
@@ -267,7 +272,7 @@
 	(let [session (common/load-session db-name key)]
 		{
 			:session session
-			:body (page/html5 head (body session form-contents))
+			:body (page/html5 head (body session prompt-contents))
 		}
 	)
 )

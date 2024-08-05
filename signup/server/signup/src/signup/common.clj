@@ -52,17 +52,19 @@
 
 (defn make-session []
 	{
+		:name ""
+		:address ""
 		:bedrooms BEDROOMS
 		:bathrooms BATHROOMS
 		:parking PARKING
 		:size SIZE
-		:address ""
 		:locations (make-locations MAP_WIDTH MAP_HEIGHT)
 	}
 )
 
-(defn fill-session [address bedrooms bathrooms parking size locations]
+(defn fill-session [name address bedrooms bathrooms parking size locations]
 	{
+		:name name
 		:address address
 		:bedrooms bedrooms
 		:bathrooms bathrooms
@@ -84,7 +86,7 @@
 (defn load-session [connection key]
 	(let 
 		[
-			column-list "id,address,bedrooms,bathrooms,parking,size,CAST(locations AS TEXT)"
+			column-list "id,name,address,bedrooms,bathrooms,parking,size,CAST(locations AS TEXT)"
 			where "magic_key=?"
 			sql (str "SELECT " column-list " FROM applicant WHERE " where ";")
 			statement [sql key]
@@ -93,6 +95,7 @@
 			[
 				result (jdbc/execute-one! connection statement)
 				id (get result :applicant/id)
+				name (get result :applicant/name)
 				address (get result :applicant/address)
 				bedrooms (get result :applicant/bedrooms)
 				bathrooms (get result :applicant/bathrooms)
@@ -104,7 +107,7 @@
 				:success true
 				:message ""
 				:id id
-				:session (fill-session address bedrooms bathrooms parking size locations)
+				:session (fill-session name address bedrooms bathrooms parking size locations)
 			}
 		)
 	)

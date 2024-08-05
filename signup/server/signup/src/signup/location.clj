@@ -36,14 +36,24 @@
 	)
 )
 
+(defn major-intersection [x y]
+	"Major intersection"
+)
+
 (defn display-tile [session x y]
 	(let 
 		[value (common/get-state session x y)]
-		(element/image {:class (str "tile_image" " " "mode" value)} (file-name x y))
+		(element/image 
+			{
+				:class (str "tile_image" " " "mode" value)
+				:alt (major-intersection x y)
+			} 
+			(file-name x y)
+		)
 	)
 )
 
-(defn location-map [session tile-fn]
+(defn location-map-tiles [session tile-fn]
 	(let 
 		[
 			outer-fn 
@@ -61,6 +71,10 @@
 		]
 		(map outer-fn (range 0 common/MAP_HEIGHT))
 	)
+)
+
+(defn location-map [session tile-fn]
+	[:div {:class "map_container"} (location-map-tiles session tile-fn)]
 )
 
 (defn update-location [session x-str y-str]

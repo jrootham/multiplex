@@ -14,18 +14,14 @@ h1
 	background: lightskyblue;
 	margin-left: auto;
 	margin-right: auto;
+	padding: 10px;
 }
 
 .choose
 {
-	width: 300px;
+	max-width: 300px;
 	display: inline-block;
 	vertical-align: top;
-}
-
-.row
-{
-	height: 50px;
 }
 
 .mode1 
@@ -40,24 +36,35 @@ h1
 
 .mode3 
 {
-    opacity: .55
-}
-
-.tile
-{
-    background-color: green;
-	display: inline-block;
-	width: 50px;
-}
-
-.tile_image
-{
-	width: 50px;
+	opacity: .55
 }
 
 .docdiv
 {
-	width: 1000px;
+	max-width: 1000px;
+}
+
+.map_container
+{
+	max-width: 1000px;
+	container-type: inline-size;
+}
+
+.row
+{
+	height: 5cqw;
+}
+
+.tile
+{
+  background-color: green;
+	display: inline-block;
+}
+
+.tile_image
+{
+	width: 5cqw;
+	aspect-ratio: 1;
 }
 
 .doctext
@@ -69,13 +76,13 @@ h1
 .legendbox
 {
 	display: grid;
-	grid-template-columns: 20em 29px auto;
+	grid-template-columns: 18em 29px auto;
 }
 
 .outersample
 {
 	width: 25px;
-    background-color: green;
+  background-color: green;
 }
 
 .sample
@@ -86,3 +93,8 @@ h1
 	background-color: white;
 }
 
+.identity-layout
+{
+	display: grid;
+	grid-template-columns: minmax(0,10em) auto;
+}
