@@ -52,6 +52,7 @@
 
 (defn make-session []
 	{
+		:verified false
 		:name ""
 		:address ""
 		:bedrooms BEDROOMS
@@ -64,6 +65,7 @@
 
 (defn fill-session [name address bedrooms bathrooms parking size locations]
 	{
+		:verified false
 		:name name
 		:address address
 		:bedrooms bedrooms

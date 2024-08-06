@@ -238,8 +238,22 @@
 				]
 				[:div (location/location-map session location/display-tile)]
 				[:div 
-					[:button "Edit"]
-					[:button "Delete"]
+					[:button 
+						{
+							:id "edit"
+							:hx-post "/multiplex/server/edit" 
+							:hx-target "#contents"
+						} 
+						"Edit"
+					]
+					[:button 
+						{
+							:id "delete"
+							:hx-post "/multiplex/server/delete" 
+							:hx-target "#contents"
+						} 
+						"Delete"
+					]
 				]
 		]
 	)
@@ -253,11 +267,15 @@
 	]
 )
 
-(defn error-body [message]
+(defn message-body [message]
 	[:div {:id "outer"}
 		[:h1 "Multiplex Signup Sheet"] 
 		[:div {:id "contents"} message ]
 	]
+)
+
+(defn message-page [message]
+	(page/html5 head (message-body message))
 )
 
 (defn new-page []
@@ -278,6 +296,14 @@
 	)
 )
 
+(defn edit-page []
+	(message-page "Edit not implemented")
+)
+
+(defn delete-page []
+	(message-page "Delete not implemented")
+)
+
 (defn verify [db-name key]
 	(try
 		(with-open [connection (common/make-connection db-name)]
@@ -290,19 +316,19 @@
 						]
 						(if verified
 							{
-								:session session
+								:session (assoc session :verified true)
 								:body (page/html5 head (body session display-contents))
 							}
-							(page/html5 head (error-body "Database update error"))
+							(page/html5 head (message-body "Database update error"))
 						)
 					)
-					(page/html5 head (error-body (get result :message)))
+					(page/html5 head (message-body (get result :message)))
 				)
 			)
 		)
 		(catch Exception exception
 			(println exception)
-			(page/html5 head (error-body (get (Throwable->map exception) :cause)))
+			(page/html5 head (message-body (get (Throwable->map exception) :cause)))
 		)
 	)	
 )

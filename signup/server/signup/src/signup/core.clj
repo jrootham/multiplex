@@ -36,24 +36,24 @@
 	"Go check your email"
 )
 
-(defn make-email-body [new-key]
+(defn make-email-body [url new-key]
 	(page/html5 
 		form/head
 		[:body 
 			[:div 
 				"Click on the link to "
-				(element/link-to (util/url common/VERIFY_URL {:key new-key}) "verify") 
+				(element/link-to (util/url url {:key new-key}) "verify") 
 				" your email"
 			]
 		]
 	)
 )
 
-(defn send-mail [address new-key]
+(defn send-mail [url address new-key]
 	(let 
 		[
 			from (:user stuff/mailer)
-			args (mail-config from address common/MAIL_SUBJECT (make-email-body new-key))
+			args (mail-config from address common/MAIL_SUBJECT (make-email-body url new-key))
 		]
 		(try
 			(make-response (postal/send-message stuff/mailer args))
@@ -132,12 +132,12 @@
 		]
 		(try
 			(if (create-applicant db-name session new-key)
-				(send-mail address new-key)
+				(send-mail common/VERIFY_URL address new-key)
 				"Database error, no update made"
 			)
 			(catch Exception exception
 				(println exception)
-				(page/html5 form/head (form/error-body (get (Throwable->map exception) :cause)))
+				(page/html5 form/head (form/message-body (get (Throwable->map exception) :cause)))
 			)
 		)
 	)
@@ -238,8 +238,46 @@
 	)
 )
 
+(defn execute-if-verified [db-name session action]
+	(if (get session :verified)
+		(action db-name session)
+		"Session is not verified"
+	)	
+)
+
+(defn do-edit [db-name session]
+)
+
+(defn edit [db-name session]
+	(execute-if-verified db-name session do-edit)
+)
+
+(defn do-mark-deleted [db-name session]
+	(let
+		[
+			address (get session :address)
+			sql "UPDATE applicant SET active=FALSE WHERE address = ?;"
+			statement [sql address]
+		]
+		(with-open [connection (common/make-connection db-name)]
+			(let [result (jdbc/execute-one! connection statement)]
+				(if (= 1 (get result :next.jdbc/update-count))
+					(str "Applicant with " address " has been marked inactive.")
+					"Database update failed"
+				)
+			)
+		)
+	)
+)
+
+(defn mark-deleted [db-name session]
+	(execute-if-verified db-name session do-mark-deleted)
+)
+
 (compojure/defroutes signup
 	(compojure/GET "/signup.html" [] (form/new-page))
+	(compojure/GET "/edit.html" [] (form/edit-page))
+	(compojure/GET "/delete.html" [] (form/delete-page))
 	(compojure/GET "/update.html" [db-name key] (form/page db-name key))
 	(compojure/GET "/verify.html" [db-name key] (form/verify db-name key))
 	(compojure/POST "/reload" [db-name session] (reload db-name session))
@@ -252,6 +290,10 @@
 		(update-data session bedrooms bathrooms parking size)
 	)
 	(compojure/POST "/location" [session x y] (location/update-location session x y))
+	(compojure/POST "/edit" [db-name session] (edit db-name session))
+	(compojure/POST "/delete" [db-name session] (mark-deleted db-name session))
+	(compojure/POST "/edit" [db-name session] (edit db-name session))
+	(compojure/POST "/delete" [db-name session] (mark-deleted db-name session))
 	(compojure-route/not-found (list "Page not found"))
 )
 
