@@ -43,6 +43,10 @@
 	]
 )
 
+(defn fragment [html]
+	(str (hiccup/html html))
+)
+
 (defn rent-string [bedrooms bathrooms parking size]
 	(let
 		[
@@ -145,11 +149,10 @@
 
 )
 
-(defn submit []
+(defn submit [target]
 	(form/submit-button 
 		{
-			:id "submit"
-			:hx-post "/multiplex/server/signup" 
+			:hx-post target
 			:hx-target "#contents"
 		} 
 		"Submit"
@@ -176,13 +179,14 @@
 					[:div "Email address"]
 					[:div (form/email-field {:required "true"} "address" address)]
 				]
-				[:button "Set Identity"]
+				[:button "Set"]
 			]
 		]
 	)
 )
 
-(defn prompt-contents [session]
+(defn prompt-contents [session target]
+(println "prompt-contents" target)
 	(let 
 		[
 			{
@@ -195,6 +199,7 @@
 				locations :locations
 			} session
 		]
+(println "prompt-contents 1 " name address)
 		[:div
 			[:div "For " name " from " address]
 			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
@@ -209,9 +214,19 @@
 			(location-docs)
 			(location/location-map session location/tile)
 
-			(submit)
+			(submit target)
 		]
 	)
+)
+
+(defn action-button [action text]
+	[:button 
+		{
+			:hx-post action 
+			:hx-target "#contents"
+		} 
+		text
+	]
 )
 
 (defn display-contents [session]
@@ -228,37 +243,23 @@
 			} session
 		]
 		[:div
-				[:div "For " name " at " address]
-				[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
-				[:div 
-					(format 
-						"Bedrooms %d bathrooms %d parking parking %d size %d sq m (%,d sq ft)"
-						bedrooms bathrooms parking size (* 10 size)
-					)
-				]
-				[:div (location/location-map session location/display-tile)]
-				[:div 
-					[:button 
-						{
-							:id "edit"
-							:hx-post "/multiplex/server/edit" 
-							:hx-target "#contents"
-						} 
-						"Edit"
-					]
-					[:button 
-						{
-							:id "delete"
-							:hx-post "/multiplex/server/delete" 
-							:hx-target "#contents"
-						} 
-						"Delete"
-					]
-				]
+			[:div "For " name " at " address]
+			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
+			[:div 
+				(format 
+					"Bedrooms %d bathrooms %d parking parking %d size %d sq m (%,d sq ft)"
+					bedrooms bathrooms parking size (* 10 size)
+				)
+			]
+			[:div (location/location-map session location/display-tile)]
+			[:div 
+				(action-button common/EDIT_IDENTITY_PROMPT "Edit name and email")
+				(action-button common/EDIT_CHOICE_PROMPT "Edit choices")
+				(action-button common/DELETE_TARGET "Delete")
+			]
 		]
 	)
 )
-
 
 (defn body [session contents]
 	[:div {:id "outer"}
@@ -274,7 +275,7 @@
 	]
 )
 
-(defn message-page [message]
+(defn base-page [message]
 	(page/html5 head (message-body message))
 )
 
@@ -297,38 +298,15 @@
 )
 
 (defn edit-page []
-	(message-page "Edit not implemented")
+	(base-page "Edit not implemented")
 )
 
 (defn delete-page []
-	(message-page "Delete not implemented")
+	(base-page "Delete not implemented")
 )
 
-(defn verify [db-name key]
-	(try
-		(with-open [connection (common/make-connection db-name)]
-			(let [result (common/load-session connection key)]
-				(if (get result :success)
-					(let 
-						[
-							verified (common/mark-verified connection (get result :id))
-							session (get result :session)
-						]
-						(if verified
-							{
-								:session (assoc session :verified true)
-								:body (page/html5 head (body session display-contents))
-							}
-							(page/html5 head (message-body "Database update error"))
-						)
-					)
-					(page/html5 head (message-body (get result :message)))
-				)
-			)
-		)
-		(catch Exception exception
-			(println exception)
-			(page/html5 head (message-body (get (Throwable->map exception) :cause)))
-		)
-	)	
+(defn error-output [display result]
+	(println display)
+	(fragment result)
 )
+
