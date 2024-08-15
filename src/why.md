@@ -1,4 +1,4 @@
-##Why live here?
+## Why live here?
 
 The good news, you are in control.  Everything from HOA-style rules, to rent increases, to how often to mow the lawn is decided by you and your neighbours, through democratic decisions.
 
