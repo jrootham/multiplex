@@ -7,7 +7,6 @@
 	(:require [signup.location :as location])
 )
 
-
 (def BEDROOM_VALUES (range 1 6))
 (def BATHROOM_VALUES (range 1 4))
 (def PARKING_VALUES (range 0 4))

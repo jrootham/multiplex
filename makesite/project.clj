@@ -7,6 +7,8 @@
   [
   	[org.clojure/clojure "1.11.3"]
   	[hiccup "2.0.0-RC1"]
+  	[commonmark-hiccup "0.2.0"]
+  	[com.atlassian.commonmark/commonmark-ext-gfm-tables "0.17.0"]
   ]
   :main ^:skip-aot makesite.core
   :target-path "target/%s"

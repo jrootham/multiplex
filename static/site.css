@@ -1,0 +1,43 @@
+.top
+{
+
+}
+
+.top-nav
+{
+
+}
+
+.top-link
+{
+	display: inline-block;
+}
+
+.link 
+{
+
+}
+
+.indent
+{
+	padding-left: 1em;
+}
+
+.side-nav
+{
+	display:  inline-block;
+	width: 40em;
+	vertical-align: top;
+	padding-right: 1em;
+	background: lightblue;
+}
+
+.contents
+{
+	display: inline-block;
+	max-width: 1000px;
+	vertical-align: top;
+	padding-left: 1em;
+	padding-right: 1em;
+	background: lightskyblue;
+}
