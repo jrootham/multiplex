@@ -1,8 +1,8 @@
 # Risks
 
-| Risk | Mitigation |
+| **Risk** | **Mitigation** |
 |:------------|:---------------------------|
-| Lack of working capital | Community bonds |
+| Lack of working capital | Community bonds, member loans |
 | Approval risk | Use as of right zoning (coming), pre/bulk approved plans (maybe) |
 | Construction risk | Insurance, completion bonds |
 | Quality risk | On site inspections, negotiated factory inspections |
@@ -10,4 +10,4 @@
 | Vacancy loss | Paid up wait list |
 | Bad debt | Large member loans |
 | Building decay | Fully paid replacement reserve plan, replacement reserve account |
- 
+|Market decline|Declining relative costs|

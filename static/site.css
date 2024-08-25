@@ -1,21 +1,40 @@
 .top
 {
-
+	padding: 20px;
 }
 
 .top-nav
 {
-
+	display: flex;
 }
 
 .top-link
 {
-	display: inline-block;
+	font-size: xx-large;
+	color: white;
+	background: blue;
+	padding: 5px;
+}
+
+.top-link a:link
+{
+	color: white;
+	background: blue;
+}
+
+.top-link a:visited
+{
+	color: white;
+	background: blue;
+}
+
+.top-space
+{
+	flex-grow: 1;
 }
 
 .link 
 {
-
 }
 
 .indent
@@ -26,7 +45,7 @@
 .side-nav
 {
 	display:  inline-block;
-	width: 40em;
+	width: 20em;
 	vertical-align: top;
 	padding-right: 1em;
 	background: lightblue;

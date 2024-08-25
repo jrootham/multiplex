@@ -37,8 +37,8 @@
 	)
 )
 
-(defn markdown-to-hiccup [markdown]
-	(markdown/markdown->hiccup markdown-config markdown)
+(defn markdown-to-hiccup [text]
+	(markdown/markdown->hiccup markdown-config text)
 )
 
 (def head
@@ -47,7 +47,7 @@
 		[:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
 		(page/include-css "common.css")
 		(page/include-css "site.css")
-		[:title "Multiplex Co-ops"]
+		[:title "Toronto Multiplex Co-ops"]
 	]
 )
 
@@ -57,12 +57,16 @@
 			label (first link)
 			href (str (first (rest link)) ".html")
 		]
-		[:div {:class "top-link"} (element/link-to href label)]
+		(list 
+			[:div {:class "top-space"}]
+			[:div {:class "top-link"} (element/link-to href label)]
+			[:div {:class "top-space"}]
+		)
 	)
 )
 
-(defn make-top-html [top]
-	[:div {:class "top"} [:div {:class "top-nav"} (map make-top-link top)]]
+(defn make-top-html [banner top]
+	[:div {:class "top"} [:div {:class "banner"} banner] [:div {:class "top-nav"} (map make-top-link top)]]
 )
 
 (defn compute-indent [row]
@@ -127,7 +131,6 @@
 	(let [tree (side-block (side-vector side page (+ 1 indent)))]
 		(cons tree (side-vector (next-link side indent) page indent))
 	)
-	
 )
 
 (defn tail [side page indent]
@@ -165,33 +168,39 @@
 	]
 )
 
-(defn make-body [input page top side]
+(defn make-body [banner-input input page top side]
 	(let
 		[
-			top-html (make-top-html top)
+			banner-hiccup (markdown-to-hiccup (slurp banner-input))
+			top-html (make-top-html banner-hiccup top)
 			side-html (make-side-html side page)
-			contents-html [:div {:class "contents"} (markdown-to-hiccup (slurp input))]
+			contents-html [:div {:class "contents" :id page} (markdown-to-hiccup (slurp input))]
 		]
 		[:body [:div {:class "outer"} top-html [:div side-html contents-html]]]
 	)
 )
 
-(defn write-a-page [source destination page top side]
+(defn write-a-page [source destination banner page top side]
 	(let 
 		[
 			name (str page ".md")
+			banner-name (str banner ".md")
 			input (io/file source name)
+			banner-input (io/file source banner-name)
 			output (io/file destination (str page ".html"))
 		]
-		(if (.exists input)
-			(spit output (page/html5 head (make-body input page top side)))
-			(println name " does not exist")
+		(if (.exists banner-input)
+			(if (.exists input)
+				(spit output (page/html5 head (make-body banner-input input page top side)))
+				(println name " does not exist")
+			)
+			(println banner-name " does not exist")
 		)
 	)
 )
 
-(defn write-site [source destination top side contents]
-	(let [write-page (fn [page] (write-a-page source destination page top side))]
+(defn write-site [source destination banner top side contents]
+	(let [write-page (fn [page] (write-a-page source destination banner page top side))]
 		(doall (map write-page contents))
 	)
 )
@@ -210,7 +219,7 @@
 	(= 2 (count row))
 )
 
-(defn makesite [src outline dest]
+(defn makesite [src outline dest banner]
 	(let 
 		[
 			source (io/file src)
@@ -225,7 +234,7 @@
 							side (map rest (filter side? tokens))
 							contents (map (fn [row] (last row)) tokens)
 						]
-						(write-site source destination top side contents)
+						(write-site source destination banner top side contents)
 					)
 				)
 				(println dest " is not a directory")
@@ -238,15 +247,16 @@
 (defn -main
   "Make a static site from a site description file and a set of .md files"
   [& args]
-  (if (= 3 (count args))
+  (if (= 4 (count args))
   	(let
   		[
   			src (nth args 0)
   			dest (nth args 1)
   			outline (nth args 2)
+  			banner (nth args 3)
   		]
-  		(makesite src outline dest)
+  		(makesite src outline dest banner)
   	)
-  	(println "java -jar makesite.jar src dest site.outline")
+  	(println "java -jar makesite.jar src dest site.outline banner")
 	)
 )
