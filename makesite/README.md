@@ -1,44 +1,46 @@
-# makesite
+## makesite
 
-FIXME: description
+### Usage
 
-## Installation
+    $ java -jar makesite.jar source destination site.outline banner
 
-Download from http://example.com/FIXME.
+|Argument|Meaning|
+|----|----|
+|source|Source directory (.md files)|
+|destination|Destination directory|
+|site.outline|Site description file (in source)|
+|banner|Name of banner .md file (without extension)|
 
-## Usage
+### Input (.md) file spec
 
-FIXME: explanation
+Markdown [translator](https://github.com/yogthos/markdown-clj) plus tables.
 
-    $ java -jar makesite-0.1.0-standalone.jar [args]
+### Input (site.outline) file spec
 
-## Options
+Tab separated file.
 
-FIXME: listing of options this app accepts.
+Last string in each line is the name of a .md file (without extension).
 
-## Examples
+Each file gets translated to HTML and embedded in a div with class "contents" and id "*name*".
 
-...
+A line that just has the name creates an unlinked HTML file.
 
-### Bugs
+A line with just a label and a name is linked to the top navigation bar.
 
-...
+A line with a leading tab is linked to the side navigation bar.
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+Each additional leading tab nests the link one more level.
 
-## License
+### Output (HTML) file 
 
-Copyright © 2024 FIXME
+There is a constant header.
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+A banner which is the translated banner.md file.
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+The top navigation div.
+
+The side navigation div is next to the contents div.
+
+
+
+
