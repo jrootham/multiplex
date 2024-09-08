@@ -4,7 +4,7 @@
 	(:require [hiccup.page :as page])
 	(:require [hiccup.element :as element])
 	(:require [signup.common :as common])
-	(:require [signup.form :as form])
+	(:require [signup.forms :as forms])
 	(:require [signup.stuff :as stuff])
 )
 
@@ -23,7 +23,7 @@
 
 (defn make-email-body [url]
 	(page/html5 
-		form/head
+		forms/head
 		[:body 
 			[:div 
 				"Click on the link to "

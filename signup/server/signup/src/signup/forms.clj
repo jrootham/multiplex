@@ -1,4 +1,4 @@
-(ns signup.form
+(ns signup.forms
 	(:gen-class)
 	(:require [hiccup2.core :as hiccup])
 	(:require [hiccup.page :as page])
@@ -148,6 +148,16 @@
 
 )
 
+(defn confirm-email [target]
+	(form/submit-button 
+		{
+			:hx-post target
+			:hx-target "#contents"
+		} 
+		"Confirm email"
+	)
+)
+
 (defn submit [target]
 	(form/submit-button 
 		{
@@ -185,7 +195,6 @@
 )
 
 (defn prompt-contents [session target]
-(println "prompt-contents" target)
 	(let 
 		[
 			{
@@ -198,7 +207,6 @@
 				locations :locations
 			} session
 		]
-(println "prompt-contents 1 " name address)
 		[:div
 			[:div "For " name " from " address]
 			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
@@ -216,6 +224,38 @@
 			(submit target)
 		]
 	)
+)
+
+(defn address-form [target address]
+	[:div
+		[:div "Email address"]
+		[:form
+			{
+				:hx-post target
+				:hx-target "#contents"
+			}
+			[:div 
+				(form/email-field {:required "true"} "address" address)
+				[:button "Submit"]
+			]
+		]
+	]
+)
+
+(defn name-form [target name]
+	[:div
+		[:div "Name"]
+		[:form
+			{
+				:hx-post target
+				:hx-target "#contents"
+			}
+			[:div 
+				(form/text-field {:required "true"} "name" name)
+				[:button "Submit"]
+			]
+		]
+	]
 )
 
 (defn action-button [action text]
@@ -252,7 +292,8 @@
 			]
 			[:div (location/location-map session location/display-tile)]
 			[:div 
-				(action-button common/EDIT_IDENTITY_PROMPT "Edit name and email")
+				(action-button common/EDIT_ADDRESS_PROMPT "Edit email")
+				(action-button common/EDIT_NAME_PROMPT "Edit name")
 				(action-button common/EDIT_CHOICE_PROMPT "Edit choices")
 				(action-button common/DELETE_TARGET "Delete")
 			]
@@ -270,7 +311,7 @@
 (defn message-body [message]
 	[:div {:id "outer"}
 		[:h1 "Multiplex Signup Sheet"] 
-		[:div {:id "contents"} message ]
+		[:div {:id "contents"} message]
 	]
 )
 
@@ -296,16 +337,105 @@
 	)
 )
 
-(defn edit-page []
-	(base-page "Edit not implemented")
+; db-name is here because the execute-if-verified call includes it
+
+(defn call-edit-prompt [db-name session]
+	(prompt-contents session common/EDIT_CHOICE_TARGET)
 )
 
-(defn delete-page []
-	(base-page "Delete not implemented")
+(defn do-edit-prompt [db-name session]
+	{
+		:session session
+		:body (fragment (prompt-contents session common/EDIT_CHOICE_TARGET))
+	}
+)
+
+(defn edit-prompt [db-name session]
+	(common/execute-if-verified db-name session do-edit-prompt)
+)
+
+; db-name is here because the execute-if-verified call includes it
+
+(defn do-identity-prompt [db-name session]
+	(identity-form session)
+)
+
+(defn identity-prompt [db-name session]
+	(common/execute-if-verified db-name session do-identity-prompt)
+)
+
+; db-name is here because the execute-if-verified call includes it
+
+(defn call-address-prompt [db-name session]
+	(address-form common/EDIT_ADDRESS_VERIFY (get session :address))
+)
+
+(defn do-address-prompt [db-name session]
+	{
+		:session session
+		:body (fragment (address-form common/EDIT_ADDRESS_VERIFY (get session :address)))
+	}
+)
+
+(defn address-prompt [db-name session]
+	(common/execute-if-verified db-name session do-address-prompt)
+)
+
+; db-name is here because the execute-if-verified call includes it
+
+(defn call-name-prompt [db-name session]
+	(name-form common/EDIT_NAME_TARGET (get session :name))
+)
+
+(defn do-name-prompt [db-name session]
+	{
+		:session session
+		:body (fragment (name-form common/EDIT_NAME_TARGET (get session :name)))
+	}
+)
+
+(defn name-prompt [db-name session]
+	(common/execute-if-verified db-name session do-name-prompt)
+)
+
+(defn do-display [db-name session]
+	(display-contents session)
+)
+
+(defn not-implemented []
+	(base-page "Not implemented")
 )
 
 (defn error-output [display result]
 	(println display)
 	(fragment result)
+)
+
+(defn signon [action]
+	(base-page (address-form action ""))
+)
+
+(defn signon-confirm [db-name key address action]
+	(with-open [connection (common/make-connection db-name)]
+		(if (common/key-checked connection address key)
+			(let [load-result (common/load-session connection address)]
+				(if (get load-result :success)
+					(let
+						[
+							session (get load-result :session)
+							verified-session (assoc session :verified true)
+							button (confirm-email action)
+							confirm-form [:form button]
+							transfer [:div confirm-form]
+						]
+						{
+							:session verified-session
+							:body (base-page transfer)
+						}
+					)
+				)
+			)
+		)
+	)
 )
 
