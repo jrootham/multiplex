@@ -1,0 +1,12 @@
+[Unit]
+Description=Multiplex signup server - prod
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/home/jrootham/multiplex/prod
+ExecStart=/usr/bin/java -jar signup.jar 5102 multiplex_prod
+
+[Install]
+WantedBy=multi-user.target

@@ -1,5 +1,6 @@
 (ns signup.core
 	(:gen-class)
+	(:require [clojure.string :as string])
 	(:require [ring.adapter.jetty :as jetty])
 	(:require [ring.util.response :as response])
 	(:require [ring.middleware.session :as session])
@@ -35,7 +36,7 @@
 
 ; verify address and display current state
 
-	(compojure/POST "/signup" [db-name session] (action/do-signup db-name session))
+	(compojure/POST "/signup" [referer db-name session] (action/do-signup referer db-name session))
 	(compojure/GET "/verify.html" 
 		[db-name key address] 
 		(verify/verify common/SIGNUP_CONFIRM_TARGET db-name key address)
@@ -54,15 +55,15 @@
 ; edit address
 
 	(compojure/POST "/address-prompt" [db-name session] (forms/address-prompt db-name session))
-	(compojure/POST "/edit-address-verify" 
-		[db-name session address] 
-		(action/edit-address-verify db-name session address)
+	(compojure/POST "/edit-address-verify"
+		[referer db-name session address] 
+		(action/edit-address-verify referer db-name session address)
 	)
 	(compojure/GET "/confirm-address.html" 
-		[db-name address old-address] 
-		(action/confirm-address db-name address old-address)
+		[db-name key address old-address] 
+		(action/confirm-address db-name key address old-address)
 	)
-	(compojure/POST "/address" 
+	(compojure/POST "/address"
 		[db-name session address old-address] 
 		(action/set-address db-name session address old-address)
 	)
@@ -74,7 +75,7 @@
 
 ; delete
 
-	(compojure/POST "/delete" [db-name session] (action/mark-deleted db-name session))
+	(compojure/POST "/delete" [db-name session] (action/delete-record db-name session))
 
 ;*********************************************************
 ; Do signon from exterior links then perform action
@@ -83,8 +84,8 @@
 ; Display
 	(compojure/GET "/display.html" [] (forms/signon "display-mail"))
 	(compojure/POST "/display-mail" 
-		[db-name address] 
-		(action/signon-mail common/DISPLAY_CONFIRM_HTML db-name address)
+		[referer db-name address] 
+		(action/signon-mail referer "display-confirm.html" db-name address)
 	)
 	(compojure/GET "/display-confirm.html" 
 		[db-name key address] 
@@ -99,10 +100,10 @@
 
 	(compojure/GET "/edit-address.html" [] (forms/signon "edit-address-mail"))
 	(compojure/POST "/edit-address-mail" 
-		[db-name address] 
-		(action/signon-mail common/EDIT_ADDRESS_CONFIRM_HTML db-name address)
+		[referer db-name address] 
+		(action/signon-mail referer "edit-address-confirm.html" db-name address)
 	)
-	(compojure/GET "/edit-address-confirm.html" 
+	(compojure/GET "/edit-address-confirm.html"
 		[db-name key address] 
 		(forms/signon-confirm db-name key address "edit-address-action")
 	)
@@ -115,8 +116,8 @@
 
 	(compojure/GET "/edit-name.html" [] (forms/signon "edit-name-mail"))
 	(compojure/POST "/edit-name-mail" 
-		[db-name address] 
-		(action/signon-mail common/EDIT_NAME_CONFIRM_HTML db-name address)
+		[referer db-name address] 
+		(action/signon-mail referer "edit-name-confirm.html" db-name address)
 	)
 	(compojure/GET "/edit-name-confirm.html" 
 		[db-name key address] 
@@ -131,8 +132,8 @@
 
 	(compojure/GET "/edit-choices.html" [] (forms/signon "edit-choices-mail"))
 	(compojure/POST "/edit-choices-mail" 
-		[db-name address] 
-		(action/signon-mail common/EDIT_CHOICES_CONFIRM_HTML db-name address)
+		[referer db-name address] 
+		(action/signon-mail referer "edit-choices-confirm.html" db-name address)
 	)
 	(compojure/GET "/edit-choices-confirm.html" 
 		[db-name key address] 
@@ -147,8 +148,8 @@
 
 	(compojure/GET "/delete.html" [] (forms/signon "delete-mail"))
 	(compojure/POST "/delete-mail" 
-		[db-name address] 
-		(action/signon-mail common/DELETE_CONFIRM_HTML db-name address)
+		[referer db-name address] 
+		(action/signon-mail referer "delete-confirm.html" db-name address)
 	)
 	(compojure/GET "/delete-confirm.html" 
 		[db-name key address] 
@@ -156,21 +157,41 @@
 	)
 	(compojure/POST "/delete-action"
 		[db-name session] 
-		(action/signon-action db-name session action/do-mark-deleted)
+		(action/signon-action db-name session action/do-delete)
 	)
 
-	(compojure-route/not-found (forms/base-page "Page not found"))
+	(compojure-route/not-found (forms/error-page "Page not found"))
 )
 
 (defn wrap-trace [handler]
 	(fn [request]
-		(let 
-			[
-				foo (println (get request :uri))
-			]
-			(handler request)
+		(let [uri (get request :uri)]
+			(if (not (string/includes? uri ".png"))
+				(println "Trace:" uri)
+			)
+		)	
+		(handler request)
+	)
+)
+
+(defn make-wrap-get-header-value [element]
+	(fn [handler]
+		(fn [request]
+			(let
+				[
+					params (get request :params)
+					headers (get request :headers)
+					value (get headers element)
+					name (keyword element)
+				] 
+				(handler (assoc request :params (assoc params name value)))
+			)
 		)
 	)
+)
+
+(def wrap-get-referer
+	(make-wrap-get-header-value "referer")
 )
 
 (defn wrap-get-session [handler]
@@ -195,6 +216,7 @@
 
 (defn handler [db-name]
 	(-> signup
+		(wrap-get-referer)
 		(wrap-db-name db-name)
 		(wrap-get-session)
 		(session/wrap-session)

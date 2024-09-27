@@ -1,11 +1,11 @@
 [Unit]
-Description=Multiplex signup server
+Description=Multiplex signup server - dev
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=10
-WorkingDirectory=/home/jrootham/multiplexes/request
+WorkingDirectory=/home/jrootham/multiplex/dev
 ExecStart=/usr/bin/java -jar signup.jar 5100 multiplex_dev
 
 [Install]

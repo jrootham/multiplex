@@ -39,29 +39,28 @@
 (def KEY_SIZE 8)
 
 ; URLs to verify email
-(def VERIFY_SIGNUP_URL "https://jrootham.ca/multiplex/server/verify.html")
-; (def VERIFY_IDENTITY_URL "https://jrootham.ca/multiplex/server/verify_identity.html")
-(def CONFIRM_SIGNON_ADDRESS_URL "https://jrootham.ca/multiplex/server/confirm-signon_address.html")
-(def CONFIRM_SIGNON_NAME_URL "https://jrootham.ca/multiplex/server/confirm-signon-name.html")
-(def CONFIRM_SIGNON_CHOICES_URL "https://jrootham.ca/multiplex/server/confirm-signon-choices.html")
-(def CONFIRM_SIGNON_DELETE_URL "https://jrootham.ca/multiplex/server/confirm-signon-delete.html")
-(def CONFIRM_EDIT_ADDRESS_URL "https://jrootham.ca/multiplex/server/confirm-address.html")
+(def VERIFY_SIGNUP_HTML "verify.html")
+; (def CONFIRM_SIGNON_ADDRESS_URL "https://jrootham.ca/multiplex/server/confirm-signon_address.html")
+; (def CONFIRM_SIGNON_NAME_URL "https://jrootham.ca/multiplex/server/confirm-signon-name.html")
+; (def CONFIRM_SIGNON_CHOICES_URL "https://jrootham.ca/multiplex/server/confirm-signon-choices.html")
+; (def CONFIRM_SIGNON_DELETE_URL "https://jrootham.ca/multiplex/server/confirm-signon-delete.html")
+(def CONFIRM_EDIT_ADDRESS_HTML "confirm-address.html")
 
-(def DISPLAY_CONFIRM_HTML "https://jrootham.ca/multiplex/server/display-confirm.html")
-(def EDIT_NAME_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-name-confirm.html")
-(def EDIT_ADDRESS_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-address-confirm.html")
-(def EDIT_CHOICES_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-choices-confirm.html")
-(def DELETE_CONFIRM_HTML "https://jrootham.ca/multiplex/server/delete-confirm.html")
+; (def DISPLAY_CONFIRM_HTML "https://jrootham.ca/multiplex/server/display-confirm.html")
+; (def EDIT_NAME_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-name-confirm.html")
+; (def EDIT_ADDRESS_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-address-confirm.html")
+; (def EDIT_CHOICES_CONFIRM_HTML "https://jrootham.ca/multiplex/server/edit-choices-confirm.html")
+; (def DELETE_CONFIRM_HTML "https://jrootham.ca/multiplex/server/delete-confirm.html")
 
 (def SIGNUP_CHOICE_TARGET "/multiplex/server/signup")
 (def SIGNUP_CONFIRM_TARGET "/multiplex/server/confirm")
-(def SIGNUP_TARGET "/multiplex/server/signup")
+; (def SIGNUP_TARGET "/multiplex/server/signup")
 
 (def EDIT_CHOICE_PROMPT "/multiplex/server/edit-prompt")
 (def EDIT_CHOICE_TARGET "/multiplex/server/edit")
 
-(def EDIT_IDENTITY_PROMPT "/multiplex/server/identity-prompt")
-(def EDIT_IDENTITY_TARGET "/multiplex/server/identity")
+; (def EDIT_IDENTITY_PROMPT "/multiplex/server/identity-prompt")
+; (def EDIT_IDENTITY_TARGET "/multiplex/server/identity")
 
 (def EDIT_ADDRESS_PROMPT "/multiplex/server/address-prompt")
 (def EDIT_ADDRESS_VERIFY "/multiplex/server/edit-address-verify")
@@ -75,6 +74,20 @@
 (defn debug [value]
 	(println value)
 	value
+)
+
+(defn make-result [result]
+	{
+		:success	true
+		:result result
+	}
+)
+
+(defn make-error [result]
+	{
+		:success false
+		:result result
+	}
 )
 
 (defn make-locations [width height]
@@ -96,7 +109,6 @@
 (defn make-session []
 	{
 		:verified false
-		:address-verified false
 		:name ""
 		:address ""
 		:bedrooms BEDROOMS
@@ -109,8 +121,7 @@
 
 (defn fill-session [name address bedrooms bathrooms parking size locations]
 	{
-		:verified false
-		:address-verified false
+		:verified true
 		:name name
 		:address address
 		:bedrooms bedrooms
@@ -134,7 +145,7 @@
 	(let 
 		[
 			column-list "id,name,address,bedrooms,bathrooms,parking,size,CAST(locations AS TEXT)"
-			where "address=? AND active"
+			where "address=?"
 			sql (str "SELECT " column-list " FROM applicant WHERE " where ";")
 			statement [sql address]
 		]
@@ -176,10 +187,6 @@
 
 (defn set-verified [connection address]	
 	(update-entry connection "verified=TRUE", address)
-)
-
-(defn set-inactive [connection address]
-	(update-entry connection "active=FALSE,verified=FALSE", address)
 )
 
 (defn key-checked [connection address key]	

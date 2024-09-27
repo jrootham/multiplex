@@ -42,8 +42,15 @@
 	]
 )
 
-(defn fragment [html]
-	(str (hiccup/html html))
+(defn fragment [html session]
+	{
+		:session session
+		:body (str (hiccup/html html))
+	}	
+)
+
+(defn error-fragment [html]
+	(fragment html nil)
 )
 
 (defn rent-string [bedrooms bathrooms parking size]
@@ -315,8 +322,15 @@
 	]
 )
 
-(defn base-page [message]
-	(page/html5 head (message-body message))
+(defn base-page [message session]
+	{
+		:session session
+		:body (page/html5 head (message-body message))
+	}
+)
+
+(defn error-page [message]
+	(base-page message nil)
 )
 
 (defn new-page []
@@ -328,14 +342,14 @@
 	)
 )
 
-(defn page [db-name key]
-	(let [session (common/load-session db-name key)]
-		{
-			:session session
-			:body (page/html5 head (body session prompt-contents))
-		}
-	)
-)
+; (defn page [db-name key]
+; 	(let [session (common/load-session db-name key)]
+; 		{
+; 			:session session
+; 			:body (page/html5 head (body session prompt-contents))
+; 		}
+; 	)
+; )
 
 ; db-name is here because the execute-if-verified call includes it
 
@@ -344,10 +358,7 @@
 )
 
 (defn do-edit-prompt [db-name session]
-	{
-		:session session
-		:body (fragment (prompt-contents session common/EDIT_CHOICE_TARGET))
-	}
+	(fragment (prompt-contents session common/EDIT_CHOICE_TARGET) session)
 )
 
 (defn edit-prompt [db-name session]
@@ -371,10 +382,7 @@
 )
 
 (defn do-address-prompt [db-name session]
-	{
-		:session session
-		:body (fragment (address-form common/EDIT_ADDRESS_VERIFY (get session :address)))
-	}
+	(fragment (address-form common/EDIT_ADDRESS_VERIFY (get session :address)) session)
 )
 
 (defn address-prompt [db-name session]
@@ -388,10 +396,7 @@
 )
 
 (defn do-name-prompt [db-name session]
-	{
-		:session session
-		:body (fragment (name-form common/EDIT_NAME_TARGET (get session :name)))
-	}
+	(fragment (name-form common/EDIT_NAME_TARGET (get session :name)) session)
 )
 
 (defn name-prompt [db-name session]
@@ -403,16 +408,16 @@
 )
 
 (defn not-implemented []
-	(base-page "Not implemented")
+	(error-page "Not implemented")
 )
 
 (defn error-output [display result]
 	(println display)
-	(fragment result)
+	(error-fragment result)
 )
 
 (defn signon [action]
-	(base-page (address-form action ""))
+	(base-page (address-form action "") nil)
 )
 
 (defn signon-confirm [db-name key address action]
@@ -428,13 +433,12 @@
 							confirm-form [:form button]
 							transfer [:div confirm-form]
 						]
-						{
-							:session verified-session
-							:body (base-page transfer)
-						}
+						(base-page transfer verified-session)
 					)
+					(error-page "Session load failure")
 				)
 			)
+			(error-page "Key mismatch")
 		)
 	)
 )

@@ -23,46 +23,51 @@
 	]
 )
 
-(defn needs-confirm [db-name key address]
+(defn needs-confirm [connection key address]
 	(let 
 		[
 			sql "SELECT magic_key FROM applicant WHERE address=?;" 
 			statement [sql address]
 		]
-		(with-open [connection (common/make-connection db-name)]
-			(let 
-				[
-					result (jdbc/execute-one! connection statement)
-				]
-				(if (seq result)
-					(let [magic-key (get result :applicant/magic_key)]
-						(if (nil? magic-key)
-							common/CONFIRM_NO
-							(if (= key magic-key)
-								common/CONFIRM_YES
-								(do 
-									(println "Key mismatch for " address " key in email " key " in database " magic-key)
-									common/CONFIRM_BAD
-								)
+		(let 
+			[
+				result (jdbc/execute-one! connection statement)
+			]
+			(if (seq result)
+				(let [magic-key (get result :applicant/magic_key)]
+					(if (nil? magic-key)
+						common/CONFIRM_NO
+						(if (= key magic-key)
+							common/CONFIRM_YES
+							(do 
+								(println "Key mismatch for " address " key in email " key " in database " magic-key)
+								common/CONFIRM_BAD
 							)
 						)
 					)
-					(do 
-						(println "Address not found for " address)
-						common/CONFIRM_BAD
-					)
+				)
+				(do 
+					(println "Address not found for " address)
+					common/CONFIRM_BAD
 				)
 			)
 		)
 	)
 )
 
+; (assoc session :verified true)
+
 (defn verify [target db-name key address]
-	(let [result (needs-confirm db-name key address)]
-		(cond 
-			(= result common/CONFIRM_YES) (forms/base-page (confirm-button target key address))
-			(= result common/CONFIRM_NO) (forms/base-page [:div "Email already confirmed"])
-			(= result common/CONFIRM_BAD) (forms/base-page [:div "Something is wrong.  Contact system operator."])
+	(with-open [connection (common/make-connection db-name)]
+		(let [result (needs-confirm connection key address)]
+			(cond 
+				(= result common/CONFIRM_YES) 
+					(let [session common/load-session connection address]
+						(forms/base-page (confirm-button target key address) session)
+					)
+				(= result common/CONFIRM_NO) (forms/error-page [:div "Email already confirmed"])
+				(= result common/CONFIRM_BAD) (forms/error-page [:div "Something is wrong.  Contact system operator."])
+			)
 		)
 	)
 )

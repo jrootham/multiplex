@@ -6,21 +6,19 @@
 	(:require [hiccup.page :as page])
 	(:require [hiccup.element :as element])
 	(:require [hiccup.form :as form])
-	(:require [hiccup.util :as util])
 	(:require [signup.common :as common])
 	(:require [signup.forms :as forms])
 	(:require [signup.mail :as mail])
 )
 
-(defn new-applicant [connection session new-key]
+(defn new-applicant [connection session]
 	(let
 		[
-			columns "(magic_key,name,address,bedrooms,bathrooms,parking,size,locations)"
-			places "(?,?,?,?,?,?,?,CAST(? AS JSON))"
+			columns "(name,address,bedrooms,bathrooms,parking,size,locations)"
+			places "(?,?,?,?,?,?,CAST(? AS JSON))"
 			sql (str "INSERT INTO applicant " columns " VALUES " places ";")
 			statement [
 									sql
-									new-key
 									(get session :name)
 									(get session :address)
 									(get session :bedrooms)
@@ -46,7 +44,7 @@
 	)
 )
 
-(defn create-applicant [db-name session new-key]
+(defn create-applicant [db-name session]
 	(let 
 		[
 			address (get session :address)
@@ -61,41 +59,51 @@
 				(if (seq result)
 					(delete-applicant connection (get result :applicant/id))
 				)
-				(new-applicant connection session new-key)
+				(new-applicant connection session)
 			)
 		)
 	)
 )
 
-(defn change-permanent-state [db-name session]
-	(let
-		[
-			new-key (common/make-key)
-			address (get session :address)
-			url (util/url common/VERIFY_SIGNUP_URL {:key new-key :address address})
-		]
+(defn change-permanent-state [referer db-name session]
+	(let [address (get session :address)]
 		(try
-			(if (create-applicant db-name session new-key)
-				(mail/send-mail url address)
-				"Database error, no update made"
+			(if (create-applicant db-name session)
+				(mail/create-and-send-confirmation-email referer common/VERIFY_SIGNUP_HTML db-name address {})
+				(common/make-error "Database error, no update made")
 			)
 			(catch Exception exception
 				(println exception)
-				(forms/fragment (forms/message-body (get (Throwable->map exception) :cause)))
+				(common/make-error (forms/message-body (get (Throwable->map exception) :cause)))
 			)
 		)
 	)
 )
 
-(defn do-signup [db-name session]
+(defn send-fragment [body session]
 	(forms/fragment 
 		[:div 
 			{:class "outer"} 
 			[:div 
 				{class "display"} 
-				(change-permanent-state db-name session)
+				body
 			]
 		]
+		session
+	)
+)
+
+(defn do-signup [referer db-name session]
+	(let 
+		[
+			return (change-permanent-state referer db-name session)
+			success (get return :success)
+			result (get return :result)
+		]
+		(if success
+			(send-fragment result nil)
+			(forms/error-fragment result)
+		)
 	)
 )
 
@@ -107,14 +115,11 @@
 )
 
 (defn identity-result [session]
-	{
-		:session session
-		:body (forms/fragment (forms/prompt-contents session common/SIGNUP_CHOICE_TARGET))
-	}
+	(forms/fragment (forms/prompt-contents session common/SIGNUP_CHOICE_TARGET) session)
 )
 
 (defn duplicate []
-	(forms/fragment "Email address already exists")
+	(forms/error-fragment "Email address already exists")
 )
 
 (defn no-applicant [db-name address]
@@ -134,16 +139,14 @@
 (defn existing-applicant [db-name address session]
 	(let
 		[
-			sql (str "SELECT active FROM applicant WHERE address=? AND verified;")
+			sql (str "SELECT COUNT(*) FROM applicant WHERE address=? AND verified;")
 			statement [sql address]
 		]
 		(with-open [connection (common/make-connection db-name)]
 			(let [result (jdbc/execute-one! connection statement)]
-				(let [active (get result :applicant/active)]
-					(if active
-						(duplicate)
-						(identity-result session)
-					)
+				(if (= (get result :count) 0)
+					(identity-result session)
+					(duplicate)
 				)
 			)
 		)
@@ -214,18 +217,14 @@
 
 (defn do-edit [db-name session]
 	(if (edit-db-update db-name session)
-		(forms/fragment (forms/display-contents session))
-		(forms/fragment "Update failed")
+		(forms/fragment (forms/display-contents session) session)
+		(forms/error-fragment "Update failed")
 	)
 )
 
 (defn edit [db-name session]
 	(common/execute-if-verified db-name session do-edit)
 )
-
-; (defn set-address [db-name session]
-; 	(forms/fragment (forms/address-form ))
-; )
 
 (defn set-name [db-name session name]
 	(let
@@ -238,37 +237,39 @@
 		(with-open [connection (common/make-connection db-name)]
 			(let [result (jdbc/execute-one! connection statement)]
 				(if (= 1 (get result :next.jdbc/update-count))
-					{
-						:session new-session
-						:body (forms/fragment (forms/display-contents new-session))
-					}
-					"Database update failed"
+					(forms/fragment (forms/display-contents new-session) new-session)
+					(forms/error-fragment "Database update failed")
 				)
 			)
 		)
 	)
 )
 
-(defn do-mark-deleted [db-name session]
+(defn delete [connection address]
 	(let
 		[
-			address (get session :address)
-			sql "UPDATE applicant SET active=FALSE,verified=FALSE WHERE address = ?;"
+			sql "DELETE FROM applicant WHERE address = ?;"
 			statement [sql address]
 		]
-		(with-open [connection (common/make-connection db-name)]
-			(let [result (jdbc/execute-one! connection statement)]
-				(if (= 1 (get result :next.jdbc/update-count))
-					(str "Applicant with " address " has been marked inactive.")
-					"Database update failed"
-				)
-			)
+		(let [result (jdbc/execute-one! connection statement)]
+			(= 1 (get result :next.jdbc/update-count))
 		)
 	)
 )
 
-(defn mark-deleted [db-name session]
-	(common/execute-if-verified db-name session do-mark-deleted)
+(defn do-delete [db-name session]
+	(with-open [connection (common/make-connection db-name)]
+		(let [address (get session :address)]
+			(if (delete connection address)
+				(str "Applicant with " address " has been deleted.")
+				"Database update failed"
+			)
+		)
+	)
+)
+ 
+(defn delete-record [db-name session]
+	(common/execute-if-verified db-name session do-delete)
 )
 
 (defn confirm [db-name key address fill]
@@ -283,10 +284,7 @@
 									[
 										session (get result :session)
 									]
-									{
-										:session (assoc session :verified true)
-										:body (forms/fragment (fill session))
-									}
+									(forms/fragment (fill session) session)
 								)
 								(forms/error-output "Load failed" "Internal error")
 							)
@@ -299,12 +297,12 @@
 		)
 		(catch Exception exception
 			(println exception)
-			(forms/fragment (get (Throwable->map exception) :cause))
+			(forms/error-fragment (get (Throwable->map exception) :cause))
 		)
 	)	
 )
 
-(defn copy-applicant [db-name session new-key address]
+(defn copy-applicant [db-name session address]
 	(with-open [connection (common/make-connection db-name)]
 		(let
 			[
@@ -319,13 +317,12 @@
 					[
 						created-at (get read-result :applicant/created_at)
 						verified-at (get read-result :applicant/verified_at)
-						columns "(created_at,magic_key,verified_at,name,address,bedrooms,bathrooms,parking,size,locations)"
-						places "(?,?,?,?,?,?,?,?,?,CAST(? AS JSON))"
+						columns "(created_at,verified_at,name,address,bedrooms,bathrooms,parking,size,locations)"
+						places "(?,?,?,?,?,?,?,?,CAST(? AS JSON))"
 						sql (str "INSERT INTO applicant " columns " VALUES " places ";")
 						statement [
 												sql
 												created-at
-												new-key
 												verified-at
 												(get session :name)
 												address
@@ -345,28 +342,37 @@
 	)
 )
 
-(defn edit-address-verify [db-name session address]
+(defn edit-address-verify [referer db-name session address]
 	(let
 		[
 			old-address (get session :address)
-			new-key (common/make-key)
-			parameters {:key new-key :address address :old-address old-address}
-			url (util/url common/CONFIRM_EDIT_ADDRESS_URL parameters)
+			parameters {:old-address old-address}
 		]
 		(try
-			(if (copy-applicant db-name session new-key address)
-				(mail/send-mail url address)
-				"Database error, no update made"
+			(if (copy-applicant db-name session address)
+				(let 
+				[
+					return (mail/create-and-send-confirmation-email 
+									referer common/CONFIRM_EDIT_ADDRESS_HTML db-name address parameters)
+					success (get return :success)
+					result (get return :result)
+				]
+					(if success
+						(forms/fragment result nil)
+						(forms/error-fragment result)
+					)
+				)
+				(forms/error-fragment "Database error, no update made")
 			)
 			(catch Exception exception
 				(println exception)
-				(forms/fragment (forms/message-body (get (Throwable->map exception) :cause)))
+				(forms/error-fragment (forms/message-body (get (Throwable->map exception) :cause)))
 			)
 		)
 	)
 )
 
-(defn confirm-address [db-name address old-address]
+(defn confirm-address [db-name key address old-address]
 	(with-open [connection (common/make-connection db-name)]
 		(let [load-result (common/load-session connection address)]
 			(if (get load-result :success)
@@ -379,12 +385,9 @@
 						form-content [:div address-field old-address-field submit]
 						form-def (form/form-to [:post common/EDIT_ADDRESS_TARGET] form-content)
 					]
-					{
-						:session session
-						:body (forms/base-page [:div form-def])
-					}
+						(forms/base-page [:div form-def] session)
 				)
-				(forms/base-page [:div "Loading session failed"])
+				(forms/error-page [:div "Loading session failed"])
 			)
 		)
 	)
@@ -401,47 +404,42 @@
 	(with-open [connection (common/make-connection db-name)]
 		(let [new-session (address-session session address)]
 			(if (common/set-verified connection address)
-				(if (common/set-inactive connection old-address)
-					{
-						:session new-session
-						:body (forms/fragment(forms/display-contents session))
-					}
-					(forms/fragment "Database error")
+				(if (delete connection old-address)
+					(forms/fragment(forms/display-contents new-session) new-session)
+					(forms/error-fragment "Database error, failed to delete old address")
 				)
-				(forms/fragment "Database error")
+				(forms/error-fragment "Database error, failed to set verified")
 			)
 		)
 	)
 )
 
-(defn signon-mail [target db-name address]
+(defn signon-mail [referer target db-name address]
 	(with-open [connection (common/make-connection db-name)]
 		(let 
 			[
-				read-sql "SELECT id FROM applicant WHERE address=? AND active;"
+				read-sql "SELECT id FROM applicant WHERE address=?;"
 				read-statement [read-sql address]
 				read-result (jdbc/execute-one! connection read-statement)
 			]
 			(if (seq read-result)
-				(let 
+				(let
 					[
-						new-key (common/make-key)
-						url (util/url target {:key new-key :address address})
-						write-sql "UPDATE applicant SET magic_key=? WHERE address=?;"
-						write-statement [write-sql new-key address]
-						write-result (jdbc/execute-one! connection write-statement)
+						return (mail/create-and-send-confirmation-email referer target db-name address {})
+						success (get return :success)
+						result (get return :result)
 					]
-					(if (= 1 (get write-result :next.jdbc/update-count)) 
-						(mail/send-mail url address)
-						(forms/fragment "Database error")
+					(if success
+						(forms/fragment result nil)
+						(forms/error-fragment result)
 					)
 				)
-				(forms/fragment (str address " not found"))
+				(forms/error-fragment (str address " not found"))
 			)
 		)
 	)
 )
 
 (defn signon-action [db-name session call]
-	(forms/fragment (call db-name session))
+	(forms/fragment (call db-name session) session)
 )

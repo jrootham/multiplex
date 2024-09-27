@@ -1,0 +1,12 @@
+[Unit]
+Description=Multiplex signup server - test
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/home/jrootham/multiplex/test
+ExecStart=/usr/bin/java -jar signup.jar 5101 multiplex_test
+
+[Install]
+WantedBy=multi-user.target

@@ -37,8 +37,16 @@
 	)
 )
 
-(defn markdown-to-hiccup [text]
-	(markdown/markdown->hiccup markdown-config text)
+(defn pitch [text]
+	(if (string/starts-with? text "# Pitch")
+		(println text)
+	)
+)
+
+(defn markdown-to-hiccup [text version]
+	(let [translated (string/replace text "{{version}}" version)]
+		(markdown/markdown->hiccup markdown-config translated)
+	)
 )
 
 (def head
@@ -168,19 +176,19 @@
 	]
 )
 
-(defn make-body [banner-input input page top side]
+(defn make-body [banner-input input page top side version]
 	(let
 		[
-			banner-hiccup (markdown-to-hiccup (slurp banner-input))
+			banner-hiccup (markdown-to-hiccup (slurp banner-input) version)
 			top-html (make-top-html banner-hiccup top)
 			side-html (make-side-html side page)
-			contents-html [:div {:class "contents" :id page} (markdown-to-hiccup (slurp input))]
+			contents-html [:div {:class "contents" :id page} (markdown-to-hiccup (slurp input) version)]
 		]
 		[:body [:div {:class "outer"} top-html [:div side-html contents-html]]]
 	)
 )
 
-(defn write-a-page [source destination banner page top side]
+(defn write-a-page [source destination banner page top side version]
 	(let 
 		[
 			name (str page ".md")
@@ -191,7 +199,7 @@
 		]
 		(if (.exists banner-input)
 			(if (.exists input)
-				(spit output (page/html5 head (make-body banner-input input page top side)))
+				(spit output (page/html5 head (make-body banner-input input page top side version)))
 				(println name " does not exist")
 			)
 			(println banner-name " does not exist")
@@ -199,8 +207,11 @@
 	)
 )
 
-(defn write-site [source destination banner top side contents]
-	(let [write-page (fn [page] (write-a-page source destination banner page top side))]
+(defn write-site [source destination banner top side contents version]
+	(let 
+		[
+			write-page (fn [page] (write-a-page source destination banner page top side version))
+		]
 		(doall (map write-page contents))
 	)
 )
@@ -219,7 +230,7 @@
 	(= 2 (count row))
 )
 
-(defn makesite [src outline dest banner]
+(defn makesite [src outline dest banner version]
 	(let 
 		[
 			source (io/file src)
@@ -234,7 +245,7 @@
 							side (map rest (filter side? tokens))
 							contents (map (fn [row] (last row)) tokens)
 						]
-						(write-site source destination banner top side contents)
+						(write-site source destination banner top side contents version)
 					)
 				)
 				(println dest " is not a directory")
@@ -247,16 +258,21 @@
 (defn -main
   "Make a static site from a site description file and a set of .md files"
   [& args]
-  (if (= 4 (count args))
+  (if (= 5 (count args))
   	(let
   		[
   			src (nth args 0)
   			dest (nth args 1)
   			outline (nth args 2)
   			banner (nth args 3)
+  			version (nth args 4)
   		]
-  		(makesite src outline dest banner)
+  		(makesite src outline dest banner version)
   	)
-  	(println "java -jar makesite.jar src dest site.outline banner")
+  	(do
+	  	(println "java -jar makesite.jar src dest site.outline banner version")
+	  	(println (count args))
+	  	(println args)
+  	)
 	)
 )
