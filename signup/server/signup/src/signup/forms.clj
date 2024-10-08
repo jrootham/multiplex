@@ -293,7 +293,7 @@
 			[:div {:id "costs"} (rent-string bedrooms bathrooms parking size)]
 			[:div 
 				(format 
-					"Bedrooms %d bathrooms %d parking parking %d size %d sq m (%,d sq ft)"
+					"Bedrooms %d bathrooms %d parking %d size %d sq m (%,d sq ft)"
 					bedrooms bathrooms parking size (* 10 size)
 				)
 			]
