@@ -1,13 +1,23 @@
 Home	index
 About	about
+Signup	/multiplex/server/signup
+Manage	manage
 	Pitch	index
+		About Co-ops	co-ops
+		About Multiplexes	multiplexes
+		High Level Outline	high
+			Goals	goals
+			Steps and Timeline	timeline
+		How to get involved	involve
+			Application	application
+			Board member 	board
 		Where?	where
 		Affordability	costs
 		City costs	city
+	Principles	principles
 	Who will do this?	who
 	Member loans	memberloans
 	Next steps	next
-	Manage application	manage
 	Project outline	outline
 		Objectives	objectives
 		Implementation strategies	implementation

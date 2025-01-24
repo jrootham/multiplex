@@ -230,6 +230,14 @@
 	(= 2 (count row))
 )
 
+(defn md-filter [name]
+	(false? (string/starts-with? name "/"))
+)
+
+(defn name-map [row]
+	(last row)
+)
+
 (defn makesite [src outline dest banner version]
 	(let 
 		[
@@ -243,7 +251,7 @@
 						[
 							top (filter top? tokens)
 							side (map rest (filter side? tokens))
-							contents (map (fn [row] (last row)) tokens)
+							contents (filter md-filter (map name-map tokens))
 						]
 						(write-site source destination banner top side contents version)
 					)

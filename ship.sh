@@ -13,3 +13,4 @@ cp static/* site
 cd makesite
 lein run ../src ../site site.outline banner $2
 
+scp ../site/* jrootham.ca_130yzdh9615@jrootham.ca:multi-$1.jrootham.ca

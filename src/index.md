@@ -1,14 +1,12 @@
-# Pitch
+# Executive Summary
 
-What if your landlord wasn't looking for profit?  What if you and your neighbours were in complete control?  What if you couldn't be renovicted or surprised by a rent increase?  What if you could have a permanent reliable home without paying Toronto real estate prices?
+The primary objective of this proposal is to build a lot of non profit co-operative housing in Toronto.
 
-We have an opportunity to do something new, that was illegal for 60 years.  We're going to create potentially endless amounts of ideal housing, homes that will raise our quality of life.
+A secondary objective is to improve the livability and effiency of the suburbs.
 
-We're building co-ops.  New co-ops, in the inner suburbs.  We're also building multiplexes, the incredibly popular (and recently legalized) small buildings with 4 homes per building.
+The proposed method to achieve these goals is to build an ecosystem of organizations to plan, finance, build, and govern the housing.  Some of these will be existing organizations (notably builders) while others will be new.
 
-Co-ops are housing where the residents (members) are in charge.  Rent is decided (democratically) at a rate just enough to cover for expenses, not to pay for someone else's retirement.
+This will be a long running continuous process. 
 
+It is not clear what the limits to scale will be.  The real open question is the effective demand.  Given that this is unsubsidized building, it will not meet any definition of affordable housing.
 
-## Apply
-
-[Application](/multiplex/server/signup.html)
