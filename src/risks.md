@@ -10,4 +10,4 @@
 | Vacancy loss | Paid up wait list |
 | Bad debt | Large member loans |
 | Building decay | Fully paid replacement reserve plan, replacement reserve account |
-|Market decline|Declining relative costs|
+| Market decline|Declining relative costs|

@@ -4,8 +4,6 @@ The fundamental purpose of this proposal is to build housing.  To do this both e
 
 Scale is one of the most important principles.  The intention is to build a lot of housing by continuously building small scale developments.  To this end we will target single lots large enough to build multiplexes.  This puts us in the suburbs.  Also, to simplify each development we will need to avoid the Committee of Adjustment.  That reduces time, money, and risk.  None of which do we have a great capacity to absorb.
 
-
-
 There is a development organization which will continuously develop buildings to be incorporated into the operating organization.  
 
 Both organizations are not for profit, this is critically important for the operating organization.
