@@ -32,7 +32,7 @@
 		[session bedrooms bathrooms parking size] 
 		(action/update-data session bedrooms bathrooms parking size)
 	)
-	(compojure/POST "/location" [session x y] (location/update-location session x y))
+;	(compojure/POST "/location" [session x y] (location/update-location session x y))
 
 ; verify address and display current state
 

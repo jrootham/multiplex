@@ -184,7 +184,7 @@
 			side-html (make-side-html side page)
 			contents-html [:div {:class "contents" :id page} (markdown-to-hiccup (slurp input) version)]
 		]
-		[:body [:div {:class "outer"} top-html [:div side-html contents-html]]]
+		[:body [:div {:class "outer"} top-html [:div {:class "columns"} side-html contents-html]]]
 	)
 )
 
@@ -216,9 +216,21 @@
 	)
 )
 
+(defn split-line [line]
+	(string/split line #"\t")
+)
+
+(defn remove-comments [line]
+	(not (string/starts-with? (string/trim line) "#"))
+)
+
+(defn remove-blanks [line]
+	(not (string/blank? line))
+)
+
 (defn tokenize [source outline]
 	(with-open [reader (io/reader (io/file source outline))]
-		(map (fn [line] (string/split line #"\t")) (doall (line-seq reader)))
+		(map split-line (filter remove-comments (filter remove-blanks (doall (line-seq reader)))))
 	)
 )
 

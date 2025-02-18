@@ -2,4 +2,4 @@
 
 Right now this website is a promotional vehicle for TMDC.
 
-[Pitch](executive.html)
+As the project advances more functionality may be added.

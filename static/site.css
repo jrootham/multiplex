@@ -42,20 +42,22 @@
 	padding-left: 1em;
 }
 
+.columns
+{
+	display: flex;
+
+}
+
 .side-nav
 {
-	display:  inline-block;
-	width: 20em;
-	vertical-align: top;
+	flex-shrink: 0;
+	width: 300px;
 	padding-right: 1em;
 	background: lightblue;
 }
 
 .contents
 {
-	display: inline-block;
-	max-width: 800px;
-	vertical-align: top;
 	padding-left: 1em;
 	padding-right: 1em;
 	background: lightskyblue;

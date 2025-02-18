@@ -1,1 +1,1 @@
-# Toronto Multiplex Co-ops {{version}}
+# Toronto Multiplex Development Co-operative {{version}}

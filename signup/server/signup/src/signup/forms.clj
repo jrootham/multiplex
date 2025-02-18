@@ -225,8 +225,8 @@
 				(pick-size size)
 			]
 
-			(location-docs)
-			(location/location-map session location/tile)
+			; (location-docs)
+			; (location/location-map session location/tile)
 
 			(submit target)
 		]
@@ -297,7 +297,7 @@
 					bedrooms bathrooms parking size (* 10 size)
 				)
 			]
-			[:div (location/location-map session location/display-tile)]
+;			[:div (location/location-map session location/display-tile)]
 			[:div 
 				(action-button common/EDIT_ADDRESS_PROMPT "Edit email")
 				(action-button common/EDIT_NAME_PROMPT "Edit name")
