@@ -1,0 +1,64 @@
+.top
+{
+	padding: 20px;
+}
+
+.top-nav
+{
+	display: flex;
+}
+
+.top-link
+{
+	font-size: xx-large;
+	color: white;
+	background: blue;
+	padding: 5px;
+}
+
+.top-link a:link
+{
+	color: white;
+	background: blue;
+}
+
+.top-link a:visited
+{
+	color: white;
+	background: blue;
+}
+
+.top-space
+{
+	flex-grow: 1;
+}
+
+.link 
+{
+}
+
+.indent
+{
+	padding-left: 1em;
+}
+
+.columns
+{
+	display: flex;
+
+}
+
+.side-nav
+{
+	flex-shrink: 0;
+	width: 300px;
+	padding-right: 1em;
+	background: lightblue;
+}
+
+.contents
+{
+	padding-left: 1em;
+	padding-right: 1em;
+	background: lightskyblue;
+}

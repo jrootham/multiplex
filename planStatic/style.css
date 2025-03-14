@@ -1,0 +1,100 @@
+body
+{
+	background: lightblue;
+}
+
+h1
+{
+	text-align: center;
+}
+
+#outer
+{
+	max-width: 1500px;
+	background: lightskyblue;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+}
+
+.choose
+{
+	max-width: 300px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.mode1 
+{
+    opacity: .85
+}
+
+.mode2 
+{
+    opacity: .7
+}
+
+.mode3 
+{
+	opacity: .55
+}
+
+.docdiv
+{
+	max-width: 1000px;
+}
+
+.map_container
+{
+	max-width: 1000px;
+	container-type: inline-size;
+}
+
+.row
+{
+	height: 5cqw;
+}
+
+.tile
+{
+  background-color: green;
+	display: inline-block;
+}
+
+.tile_image
+{
+	width: 5cqw;
+	aspect-ratio: 1;
+}
+
+.doctext
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.legendbox
+{
+	display: grid;
+	grid-template-columns: 18em 29px auto;
+}
+
+.outersample
+{
+	width: 25px;
+  background-color: green;
+}
+
+.sample
+{
+	width: 25px;
+	height: 25px;
+	border: solid black 1px; 
+	background-color: white;
+}
+
+.identity-layout
+{
+	display: grid;
+	grid-template-columns: minmax(0,10em) auto;
+}
