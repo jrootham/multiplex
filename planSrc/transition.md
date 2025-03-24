@@ -1,4 +1,4 @@
-### Transition
+# Transition
 
 When a building is done people on the waiting list with enough money to cover the member loan are elegible to join the new co-op.
 

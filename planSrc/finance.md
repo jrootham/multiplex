@@ -4,8 +4,6 @@ There are some initial filing and legal costs, the current plan is to fundraise 
 
 There are several stages to the development process, each will require financing.
 
-The first is presentations to prospective members, an admission fee will cover the costs of the presentation.
-
 A member loan to the development co-op will provide working capital to cover overheads and startup costs for the development of projects.  Current plan is this will be $2,000.
 
 Enough working capital to build the project is expected to come from short term fixed rate Community Bonds.
