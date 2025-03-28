@@ -1,0 +1,29 @@
+<header class="container">
+  <nav>
+    <ul>
+      <li><a href="{{ '/' | relative_url }}">{{ site.title | escape }}</a></li>
+    </ul>
+    <ul>
+      <li>
+        <details class="dropdown">
+          <summary>Learn More</summary>
+          <ul dir="rtl">
+            <li><a href="/about">About</a></li>
+            <li><a href="/pitch">Pitch</a></li>
+          </ul>
+        </details>
+      </li>
+      <li><a href="/posts">Updates</a></li>
+      <li>
+        <details class="dropdown">
+          <summary role="button" class="secondary">Theme</summary>
+          <ul>
+            <li><a href="#" data-theme-switcher="auto">Auto</a></li>
+            <li><a href="#" data-theme-switcher="light">Light</a></li>
+            <li><a href="#" data-theme-switcher="dark">Dark</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+  </nav>
+</header>
