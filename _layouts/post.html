@@ -1,0 +1,28 @@
+---
+layout: base
+---
+
+<main class="container">
+  <article>
+    <header>
+      <hgroup>
+        <h1>{{ page.title }}</h1>
+        <p><small>{{ page.date | date: "%B %d, %Y" }}</small></p>
+      </hgroup>
+    </header>
+
+    <div>
+      {{ content }}
+    </div>
+
+    <footer>
+      {% if page.tags %}
+        <p><strong>Tags:</strong>
+          {% for tag in page.tags %}
+            <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </p>
+      {% endif %}
+    </footer>
+  </article>
+</main>

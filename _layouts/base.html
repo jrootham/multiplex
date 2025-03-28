@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{ title }}</title>
+    <meta name="description" content="{{description}}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.violet.min.css">
+  </head>
+  <body>
+    {% include header.html %}
+    {{ content }}
+    {% include footer.html %}
+    <script src="{{ site.baseurl }}/assets/js/minimal-theme-switcher.js"></script>
+    <script src="{{ site.baseurl }}/assets/js/modal.js"></script>
+  </body>
+</html>
