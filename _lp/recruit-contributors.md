@@ -6,6 +6,7 @@ hero_subtitle: From strategy to storytelling, we're looking for brilliant minds 
 cta_text: Join the Contributor Team
 cta_link: /contact
 include_signup_form: false
+path: help-build-a-housing-revolution
 ---
 
 TMDC is looking for early contributors across areas like design, planning, engagement, legal, and communications.

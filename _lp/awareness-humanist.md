@@ -6,6 +6,7 @@ hero_subtitle: TMDC’s co-op multiplexes are designed for long-term community b
 cta_text: Sign Up for Updates
 cta_link: /signup
 include_signup_form: true
+path: homes-that-put-people-first
 ---
 
 We believe in a future where your home is built for you—not for someone else’s bottom line.

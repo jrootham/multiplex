@@ -56,3 +56,6 @@ collections:
   projects:
     output: true
     permalink: /project/:path
+  lp:
+    output: true
+    permalink: /lp/:path

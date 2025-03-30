@@ -6,6 +6,7 @@ hero_subtitle: TMDC’s member-driven co-ops are creating lasting community valu
 cta_text: Explore the Model
 cta_link: /finance
 include_signup_form: true
+path: invest-in-a-more-equitable-toronto
 ---
 
 We're offering community bonds and member loans to fund the development of stable, climate-smart, resident-run housing.

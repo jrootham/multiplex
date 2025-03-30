@@ -6,6 +6,7 @@ hero_subtitle: TMDC is building co-op multiplexes in Toronto's suburbs. No landl
 cta_text: Join the Waitlist
 cta_link: /signup
 include_signup_form: true
+path: community-owned-housing-in-toronto
 ---
 
 We’re a community-led, not-for-profit initiative to create stable, affordable, climate-conscious homes across Toronto.

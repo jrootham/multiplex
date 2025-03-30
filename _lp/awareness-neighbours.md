@@ -6,6 +6,7 @@ hero_subtitle: TMDC is building resident-led communities in Toronto’s inner su
 cta_text: Join the Waitlist
 cta_link: /signup
 include_signup_form: true
+path: what-if-you-knew-your-neighbours
 ---
 
 We’re creating a new kind of neighborhood—one where decisions are made together, costs are shared, and care is part of the structure.

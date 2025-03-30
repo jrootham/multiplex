@@ -6,6 +6,7 @@ hero_subtitle: No landlords. No surprises. Just a community you help govern.
 cta_text: Learn More
 cta_link: /how-it-works
 include_signup_form: false
+path: what-if-we-could-rethink-rent
 ---
 
 TMDC is creating a system of community-owned housing in Toronto’s inner suburbs.
