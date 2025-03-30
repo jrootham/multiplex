@@ -1,0 +1,122 @@
+---
+layout: base
+---
+
+<main class="container">
+  <article>
+    <header>
+      <hgroup>
+        <h1>{{ page.title }}</h1>
+        <p>{{ page.summary }}</p>
+      </hgroup>
+      <details>
+        <summary>Table of Contents</summary>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#okrs">Objectives</a></li>
+          <li><a href="#milestones">Milestones</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#risks">Risks</a></li>
+          <li><a href="#content">Content</a></li>
+        </ul>
+      </details>
+    </header>
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>{{ page.description }}</p>
+      <p>
+        <strong>Status:</strong>
+        <span>{{ page.status | capitalize }}</span>
+      </p>
+    </section>
+    <hr />
+    {% if page.objectives %}
+    <section id="okrs">
+      <h2>Objectives</h2>
+      {% for obj in page.objectives %}
+      <details name="objectives">
+        <summary role="button" class="outline secondary">
+          <strong>Objective:</strong> {{ obj.description }}
+        </summary>
+        <p><strong>Key Results:</strong></p>
+        <ul>
+          {% for kr in obj.key_results %}
+          <li>{{ kr.status }} {{ kr.text }}</li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% endfor %}
+    </section>
+    <hr />
+    {% endif %} {% if page.milestones %}
+    <section id="milestones">
+      <h2>Milestones</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Milestone</th>
+            <th>Description</th>
+            <th>Target Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in page.milestones %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.target_date }}</td>
+            <td>{{ item.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <hr />
+    {% endif %} {% if page.team %}
+    <section id="team">
+      <h2>Contributors</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Contributor(s)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in page.team %}
+          <tr>
+            <td>{{ member.role }}</td>
+            <td>{{ member.contributor }}</td>
+            <td>{{ member.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <hr />
+    {% endif %} {% if page.risks %}
+    <section id="risks">
+      <h2>Risks & Considerations</h2>
+      <ul>
+        {% for risk in page.risks %}
+        <li>{{ risk.text }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <hr />
+    {% endif %}
+
+    <section id="content">{{content}}</section>
+
+    </section>
+
+    <footer>
+      <div role="group">
+        <a class="secondary" role="button" href="/projects">← Return to Projects Overview</a>
+      </div>
+      </footer>
+
+  </article>
+</main>

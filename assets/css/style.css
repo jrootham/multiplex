@@ -1,0 +1,41 @@
+/* Layout support for TOC in PicoCSS */
+main.has-table-of-contents {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  grid-template-columns: 11rem 1fr;
+  grid-template-areas:
+    "menu header"
+    "menu table-of-content"
+    "menu body";
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+@media (min-width: 1280px) {
+  main.has-table-of-contents {
+    grid-template-columns: 10.5rem 1fr 10.5rem;
+    grid-template-areas:
+      "menu header table-of-content"
+      "menu body table-of-content";
+  }
+}
+
+main > aside#documentation-menu {
+  grid-area: menu;
+}
+
+main > hgroup {
+  grid-area: header;
+}
+
+main > aside#table-of-contents {
+  grid-area: table-of-content;
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+main > [role="document"] {
+  grid-area: body;
+}

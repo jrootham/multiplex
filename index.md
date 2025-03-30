@@ -13,7 +13,7 @@ As the project advances more functionality may be added.
 
 ---
 
-# Pitch
+# Short Pitch
 
 What if your landlord wasn't looking for profit? What if you and your neighbours were in complete control? What if you couldn't be renovicted or surprised by a rent increase? What if you could have a permanent reliable home without paying Toronto real estate prices?
 
