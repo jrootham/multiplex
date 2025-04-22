@@ -1,19 +1,58 @@
 <footer class="container">
-  <header>
-      <p>
-          {{ site.title | escape }}
-      </p>
-  </header>
   <div class="grid">
+    <article>
+      <header>
+        <strong>{{ site.title | escape }}</strong>
+      </header>
       <p>{{ site.description | escape }}</p>
-      <aside>
+      <footer>
+        <nav>
+          <ul>
+            <li>Connect:</li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Bluesky</a></li>
+            <li><a href="#">GitHub</a></li>
+          </ul>
+        </nav>
+      </footer>
+    </article>
+    <div class="grid">
+      <article>
+        <header><strong>Learn</strong></header>
+        <aside>
           <nav>
-              <ul>
-                  <li>
-                      <a href="#" target="_blank">Footer</a>
-                  </li>
-              </ul>
+            <ul>
+              <li>
+                <a href="/initiative/">About the Initiative</a>
+              </li>
+              <li>
+                <a href="/membership/">About Membership</a>
+              </li>
+              <li>
+                <a href="/construction/">About the Multiplexes</a>
+              </li>
+            </ul>
           </nav>
-      </aside>
+        </aside>
+      </article>
+      <article>
+        <header><strong>Participate</strong></header>
+        <aside>
+          <nav>
+            <ul>
+              <li>
+                <a href="/contribute/">Contribute</a>
+              </li>
+              <li>
+                <a href="/register/">Pre-Register</a>
+              </li>
+              <li>
+                <a href="/projects/">Project Status</a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+      </article>
+    </div>
   </div>
 </footer>

@@ -6,11 +6,19 @@
     <meta name="color-scheme" content="light dark" />
     <title>{{ title }}</title>
     <meta name="description" content="{{description}}" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.violet.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.pink.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css"
+    />
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css" />
   </head>
   <body>
-    {% include header.html %}
-    {{ content }}
+    {% include header.html %} {{ content }}
+    <hr class="container" />
     {% include footer.html %}
     <script src="{{ site.baseurl }}/assets/js/minimal-theme-switcher.js"></script>
     <script src="{{ site.baseurl }}/assets/js/modal.js"></script>

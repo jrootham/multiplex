@@ -1,5 +1,6 @@
 ---
-title: More Details
+title: Membership Responsibilities
+description: What does membership entail?
 layout: page
 ---
 
@@ -35,3 +36,10 @@ Typically President, Vice President, Treasurer, and Secretary. Each has particul
 ## Signing Officers
 
 Certain board members are designated as signing officers. These people review and sign all the financial transactions the co-op makes.
+
+<footer>
+<div role="group">
+  <a class="secondary" role="button" href="/membership/how-membership-works">← Return to How Membership Works</a>
+  <a class="secondary" role="button" href="/membership/money-matters">Proceed to Money Matters →</a>
+</div>
+</footer>

@@ -1,0 +1,36 @@
+---
+layout: base
+---
+
+<main class="container">
+  <section class="hero" style="padding: 4rem 0; text-align: center">
+    <h1>{{ page.hero_title | default: page.title }}</h1>
+    {% if page.hero_subtitle %}
+    <p class="lead">{{ page.hero_subtitle }}</p>
+    {% endif %} {% if page.cta_text and page.cta_link %}
+    <p>
+      <a href="{{ page.cta_link }}" class="contrast button"
+        >{{ page.cta_text }}</a
+      >
+    </p>
+    {% endif %}
+  </section>
+
+  <section class="content" style="margin-top: 2rem">
+    <article>{{ content }}</article>
+  </section>
+
+  {% if page.include_signup_form %}
+  <section class="signup" style="margin-top: 4rem; text-align: center">
+    <h2>Stay in the loop</h2>
+    <p>
+      Get updates, news, and invitations as we build community-owned housing in
+      Toronto.
+    </p>
+    <form method="post" action="#">
+      <input type="email" name="email" placeholder="Your email" required />
+      <button type="submit">Sign up</button>
+    </form>
+  </section>
+  {% endif %}
+</main>
