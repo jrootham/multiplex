@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<title>Multiplex Signup</title>
+	<script 
+		src="https://unpkg.com/htmx.org@1.9.12" 
+		integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" 
+		crossorigin="anonymous"
+	>
+	</script>
+
+</head>
+<body>
+	<div id="outer">
+		<h1>Multiplex Signup Sheet</h1>
+		<div id="contents">
+			<form hx-post="/multiplex/server/update" hx-trigger="change" hx-target="#costs">
+				<div id="costs">
+					Expected rent: $1,100 Expected Member Loan: $8,800S
+				</div>
+
+				<div>
+	<label for="email">Enter your email:</label>
+
+	<input type="email" id="email" size="30" required />
+
+</div>
+
+				<div class="choose">
+	<fieldset>
+		<legend>Select number of bedrooms</legend>
+		<div>
+		    <input type="radio" id="onebed" name="bedrooms" value="1" checked />
+		    <label for="onebed">One bedroom</label>
+		 </div>
+		<div>
+		    <input type="radio" id="twobed" name="bedrooms" value="2" />
+		    <label for="twobed">Two bedrooms</label>
+		 </div>
+		<div>
+		    <input type="radio" id="threebed" name="bedrooms" value="3" />
+		    <label for="threebed">Three bedrooms</label>
+		 </div>
+		<div>
+		    <input type="radio" id="fourbed" name="bedrooms" value="4" />
+		    <label for="fourbed">Four bedrooms</label>
+		 </div>
+		<div>
+		    <input type="radio" id="fivebed" name="bedrooms" value="5" />
+		    <label for="fivebed">Five bedrooms</label>
+		 </div>
+		<div>
+		    <input type="radio" id="sixbed" name="bedrooms" value="6" />
+		    <label for="sixbed">Six bedrooms</label>
+		 </div>
+	</fieldset>
+</div>
+
+				<div class="choose">
+	<fieldset>
+		<legend>Select number of bathrooms</legend>
+		<div>
+		    <input type="radio" id="onebath" name="bathrooms" value="1" checked />
+		    <label for="onebath">One bathroom</label>
+		 </div>
+		<div>
+		    <input type="radio" id="twobath" name="bathrooms" value="2" />
+		    <label for="twobath">Two bathrooms</label>
+		 </div>
+		<div>
+		    <input type="radio" id="threebath" name="bathrooms" value="3" />
+		    <label for="threebath">Three bathrooms</label>
+		 </div>
+	</fieldset>
+</div>
+
+				<div class="choose">
+	<fieldset>
+		<legend>Select number of parking lots (not on site)</legend>
+		<div>
+		    <input type="radio" id="nolot" name="lots" value="0" checked />
+		    <label for="nolot">No parking lots</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onelot" name="lots" value="1" />
+		    <label for="onelot">One parking lot</label>
+		 </div>
+		<div>
+		    <input type="radio" id="twolot" name="lots" value="2" />
+		    <label for="twolot">Two parking lots</label>
+		 </div>
+		<div>
+		    <input type="radio" id="threelot" name="lots" value="3" />
+		    <label for="threelot">Three parking lots</label>
+		 </div>
+		<div>
+		    <input type="radio" id="fourlot" name="lots" value="4" />
+		    <label for="fourlot">Four parking lots</label>
+		 </div>
+	</fieldset>
+</div>
+
+				<div class="choose">
+	<fieldset>
+		<legend>Select size of unit</legend>
+		<div>
+		    <input type="radio" id="fifty" name="size" value="50" checked />
+		    <label for="fifty">50 sq m (500 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="sixty" name="size" value="60" />
+		    <label for="sixty">60 sq m (600 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="seventy" name="size" value="70" />
+		    <label for="seventy">70 sq m (700 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="eighty" name="size" value="80" />
+		    <label for="eighty">80 sq m (800 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="ninety" name="size" value="90" />
+		    <label for="ninety">90 sq m (900 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onehundred" name="size" value="100" />
+		    <label for="onehundred">100 sq m (1000 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="oneten" name="size" value="110" />
+		    <label for="oneten">110 sq m (1100 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onetwenty" name="size" value="120" />
+		    <label for="onetwenty">120 sq m (1200 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onethirty" name="size" value="130" />
+		    <label for="onethirty">130 sq m (1300 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="oneforty" name="size" value="140" />
+		    <label for="oneforty">140 sq m (1400 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onefifty" name="size" value="150" />
+		    <label for="onefifty">150 sq m (1500 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="onesixty" name="size" value="160" />
+		    <label for="onesixty">160 sq m (1600 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="oneseventy" name="size" value="170" />
+		    <label for="oneseventy">170 sq m (1700 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="oneeighty" name="size" value="180" />
+		    <label for="oneeighty">180 sq m (1800 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="oneninety" name="size" value="190" />
+		    <label for="oneninety">190 sq m (1900 sq ft)</label>
+		 </div>
+		<div>
+		    <input type="radio" id="twohundred" name="size" value="200" />
+		    <label for="twohundred">200 sq m (2000 sq ft)</label>
+		 </div>
+	</fieldset>
+</div>
+
+				<button hx-post="/multiplex/server/signup" hx-target="#contents">Submit</button>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

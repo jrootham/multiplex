@@ -1,4 +1,4 @@
-# Previsouly
+# Previously
 site
 planSite
 ship_dev.sh
@@ -11,3 +11,7 @@ _site
 .sass-cache
 */.DS_Store
 vendor
+
+# Newer
+images/*
+makesite/*
